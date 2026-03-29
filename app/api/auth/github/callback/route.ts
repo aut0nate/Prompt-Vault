@@ -8,11 +8,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
+  const appOrigin = getAppOrigin(request);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
 
   if (!code || !state) {
-    return NextResponse.redirect(new URL("/login?error=missing_oauth_response", url.origin));
+    return NextResponse.redirect(new URL("/login?error=missing_oauth_response", appOrigin));
   }
 
   const stateCookie = request.headers.get("cookie")
@@ -23,22 +24,22 @@ export async function GET(request: Request) {
   const nextPath = consumeGitHubState(stateCookie ? decodeURIComponent(stateCookie) : undefined, state);
 
   if (!nextPath) {
-    return NextResponse.redirect(new URL("/login?error=invalid_state", url.origin));
+    return NextResponse.redirect(new URL("/login?error=invalid_state", appOrigin));
   }
 
   try {
-    const redirectUri = `${getAppOrigin(request)}/api/auth/github/callback`;
+    const redirectUri = `${appOrigin}/api/auth/github/callback`;
     const accessToken = await exchangeGitHubCode(code, redirectUri);
     const githubUser = await getGitHubUser(accessToken);
 
     if (!isAllowedGitHubUser(githubUser.login)) {
-      const response = NextResponse.redirect(new URL("/login?error=not_allowed", url.origin));
+      const response = NextResponse.redirect(new URL("/login?error=not_allowed", appOrigin));
       response.cookies.delete(GITHUB_STATE_COOKIE);
       return response;
     }
 
     const token = await createSessionToken(githubUser.login);
-    const response = NextResponse.redirect(new URL(nextPath, url.origin));
+    const response = NextResponse.redirect(new URL(nextPath, appOrigin));
     response.cookies.delete(GITHUB_STATE_COOKIE);
     response.cookies.set(SESSION_COOKIE_NAME, token, {
       httpOnly: true,
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
     });
     return response;
   } catch {
-    const response = NextResponse.redirect(new URL("/login?error=github_auth_failed", url.origin));
+    const response = NextResponse.redirect(new URL("/login?error=github_auth_failed", appOrigin));
     response.cookies.delete(GITHUB_STATE_COOKIE);
     return response;
   }

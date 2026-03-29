@@ -1,0 +1,15 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" fill="#F8F2EA"/>
+  <path d="M128 17L219 70V175L107 239V204L43 167V70L128 17Z" fill="#FFFDF9"/>
+  <path d="M128 35L204 79V165L107 221V192L58 163V79L128 35Z" fill="#1C1C1F"/>
+  <path d="M128 49L189 85V158L107 205V177L73 157V85L128 49Z" stroke="#DF5E30" stroke-width="8"/>
+  <circle cx="128" cy="123" r="16" fill="#DF5E30" stroke="#FFFDF9" stroke-width="8"/>
+  <path d="M128 65V106" stroke="#DF5E30" stroke-width="8" stroke-linecap="square"/>
+  <path d="M128 140V181" stroke="#DF5E30" stroke-width="8" stroke-linecap="square"/>
+  <path d="M89 87L114 111" stroke="#DF5E30" stroke-width="8" stroke-linecap="square"/>
+  <path d="M142 135L167 159" stroke="#DF5E30" stroke-width="8" stroke-linecap="square"/>
+  <path d="M167 87L142 111" stroke="#DF5E30" stroke-width="8" stroke-linecap="square"/>
+  <path d="M114 135L89 159" stroke="#DF5E30" stroke-width="8" stroke-linecap="square"/>
+  <path d="M109 123H81" stroke="#4A90E2" stroke-width="8" stroke-linecap="square"/>
+  <path d="M175 123H147" stroke="#4A90E2" stroke-width="8" stroke-linecap="square"/>
+ </svg>

@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#F8F2EA"/>
+  <path d="M256 56L420 152V338L234 456V396L112 326V152L256 56Z" fill="#1C1C1F"/>
+  <path d="M256 34L438 140V350L214 478V407L86 333V140L256 34Z" fill="#FFFDF9"/>
+  <path d="M256 70L408 158V329L234 430V375L136 321V158L256 70Z" fill="#1C1C1F"/>
+  <path d="M256 94L386 169V315L234 402V356L156 311V169L256 94Z" stroke="#DF5E30" stroke-width="10" stroke-linejoin="miter"/>
+  <circle cx="256" cy="248" r="28" fill="#DF5E30" stroke="#FFFDF9" stroke-width="10"/>
+  <path d="M256 122V220" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M256 276V374" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M168 170L233 233" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M279 264L344 327" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M344 170L279 233" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M233 264L168 327" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M182 248H228" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M284 248H330" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M196 192L228 205" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M316 192L284 205" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M196 304L228 291" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M316 304L284 291" stroke="#DF5E30" stroke-width="10" stroke-linecap="square"/>
+  <path d="M233 233L195 180L256 122L317 180L279 233" stroke="#4A90E2" stroke-width="10" stroke-linejoin="miter"/>
+  <path d="M233 264L195 317L256 374L317 317L279 264" stroke="#4A90E2" stroke-width="10" stroke-linejoin="miter"/>
+  <path d="M228 248L156 248" stroke="#4A90E2" stroke-width="10" stroke-linecap="square"/>
+  <path d="M356 248L284 248" stroke="#4A90E2" stroke-width="10" stroke-linecap="square"/>
+</svg>
