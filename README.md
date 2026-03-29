@@ -100,5 +100,5 @@ docker compose down
 Notes:
 
 - The SQLite database is stored in a named Docker volume mounted at `/app/prisma`.
-- The Docker build uses `DATABASE_URL` from `.env` as a build argument so Next.js can prerender pages that query Prisma.
+- Docker uses an absolute SQLite path inside the container, `/app/prisma/dev.db`, so build-time and runtime Prisma point at the same database file.
 - The runtime image installs OpenSSL for Prisma, carries production-only Node dependencies, and runs as a non-root user.
