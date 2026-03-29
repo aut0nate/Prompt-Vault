@@ -31,6 +31,16 @@ function uploadedFiles(formData: FormData, key: string) {
   return formData.getAll(key).filter((value): value is globalThis.File => value instanceof File && value.size > 0);
 }
 
+async function deleteUnusedTags() {
+  await prisma.tag.deleteMany({
+    where: {
+      prompts: {
+        none: {},
+      },
+    },
+  });
+}
+
 async function savePrompt(id: string | null, formData: FormData): Promise<PromptFormState> {
   await requireAdmin();
 
@@ -152,6 +162,8 @@ async function savePrompt(id: string | null, formData: FormData): Promise<Prompt
     throw error;
   }
 
+  await deleteUnusedTags();
+
   revalidatePath("/");
   revalidatePath("/admin");
 
@@ -209,6 +221,7 @@ export async function deletePromptAction(id: string) {
     where: { id },
   });
 
+  await deleteUnusedTags();
   await Promise.allSettled(attachments.map((attachment) => deleteStoredAttachment(attachment.storagePath)));
   await deletePromptAttachmentDirectoryIfEmpty();
 

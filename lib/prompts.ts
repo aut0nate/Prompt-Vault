@@ -196,6 +196,9 @@ export async function getPromptList(
         name: true,
       },
       where: {
+        prompts: {
+          some: {},
+        },
         name: {
           not: "",
         },
@@ -271,6 +274,9 @@ export async function getPromptEditorSuggestions(): Promise<PromptEditorSuggesti
         name: true,
       },
       where: {
+        prompts: {
+          some: {},
+        },
         name: {
           not: "",
         },
