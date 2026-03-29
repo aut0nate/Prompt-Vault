@@ -1,4 +1,4 @@
-import { dirname, isAbsolute, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
@@ -19,14 +19,15 @@ function resolveDatabasePath(databaseUrl) {
 const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
 const databasePath = resolveDatabasePath(databaseUrl);
 const absoluteDatabaseUrl = `file:${databasePath}`;
+const prismaBinary = join(process.cwd(), "node_modules", ".bin", process.platform === "win32" ? "prisma.cmd" : "prisma");
 
 mkdirSync(dirname(databasePath), { recursive: true });
 
 const diffArgs = existsSync(databasePath)
-  ? ["prisma", "migrate", "diff", "--from-url", absoluteDatabaseUrl, "--to-schema-datamodel", "prisma/schema.prisma", "--script"]
-  : ["prisma", "migrate", "diff", "--from-empty", "--to-schema-datamodel", "prisma/schema.prisma", "--script"];
+  ? ["migrate", "diff", "--from-url", absoluteDatabaseUrl, "--to-schema-datamodel", "prisma/schema.prisma", "--script"]
+  : ["migrate", "diff", "--from-empty", "--to-schema-datamodel", "prisma/schema.prisma", "--script"];
 
-const schemaSql = execFileSync("npx", diffArgs, {
+const schemaSql = execFileSync(prismaBinary, diffArgs, {
   cwd: process.cwd(),
   encoding: "utf8",
   env: {
