@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { getAppOrigin } from "@/lib/app-origin";
 import { consumeGitHubState, exchangeGitHubCode, getGitHubUser, GITHUB_STATE_COOKIE, isAllowedGitHubUser } from "@/lib/github-auth";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const redirectUri = `${url.origin}/api/auth/github/callback`;
+    const redirectUri = `${getAppOrigin(request)}/api/auth/github/callback`;
     const accessToken = await exchangeGitHubCode(code, redirectUri);
     const githubUser = await getGitHubUser(accessToken);
 

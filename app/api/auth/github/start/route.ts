@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createGitHubState, encodeGitHubStateCookie, getGitHubClientId, GITHUB_STATE_COOKIE } from "@/lib/github-auth";
+import { getAppOrigin } from "@/lib/app-origin";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ export async function GET(request: Request) {
   const nextPath = url.searchParams.get("next");
   const safeNextPath = nextPath && nextPath.startsWith("/") ? nextPath : "/admin";
   const state = createGitHubState();
-  const redirectUri = `${url.origin}/api/auth/github/callback`;
+  const redirectUri = `${getAppOrigin(request)}/api/auth/github/callback`;
 
   const githubUrl = new URL("https://github.com/login/oauth/authorize");
   githubUrl.searchParams.set("client_id", getGitHubClientId());

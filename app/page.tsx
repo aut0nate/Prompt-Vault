@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { LibraryShell } from "@/components/library-shell";
@@ -34,7 +35,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <p className="mb-4 inline-flex rounded-full border border-line/70 bg-panel/70 px-4 py-2 text-xs uppercase tracking-[0.26em] text-muted">
             Personal prompt library
           </p>
-          <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">Prompt Hub</h1>
+          <div className="flex items-center gap-4 md:gap-5">
+            <Image
+              src="/prompt-hub-logo.svg"
+              alt=""
+              aria-hidden="true"
+              width={80}
+              height={80}
+              className="h-16 w-16 shrink-0 md:h-20 md:w-20"
+            />
+            <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">Prompt Hub</h1>
+          </div>
           <p className="mt-5 max-w-2xl text-base leading-8 text-foreground/72 md:text-lg">
             Keep your best prompts in one elegant place, search them quickly, and reopen full examples whenever you
             need them.
