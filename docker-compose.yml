@@ -1,15 +1,27 @@
 services:
   prompt-hub:
+    container_name: prompt-hub
     build:
       context: .
       args:
         DATABASE_URL: ${DATABASE_URL}
-    ports:
-      - "3000:3000"
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
       - prompt-hub-data:/app/prisma
+    networks:
+      - edge-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
 
 volumes:
   prompt-hub-data:
+
+networks:
+  edge-net:
+    external: true
