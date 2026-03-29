@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import {
+  deletePromptAttachmentDirectoryIfEmpty,
+  deleteStoredAttachment,
+  persistAttachmentFile,
+} from "@/lib/attachments";
 import { clearSessionCookie, requireAdmin } from "@/lib/auth";
 import { ensureUniquePromptSlug } from "@/lib/prompts";
 import { prisma } from "@/lib/prisma";
@@ -22,8 +27,18 @@ function formValue(formData: FormData, key: string) {
   return String(formData.get(key) ?? "");
 }
 
+function uploadedFiles(formData: FormData, key: string) {
+  return formData.getAll(key).filter((value): value is globalThis.File => value instanceof File && value.size > 0);
+}
+
 async function savePrompt(id: string | null, formData: FormData): Promise<PromptFormState> {
   await requireAdmin();
+
+  const files = uploadedFiles(formData, "attachments");
+  const removeAttachmentIds = formData
+    .getAll("removeAttachmentIds")
+    .map((value) => String(value))
+    .filter(Boolean);
 
   const parsed = promptFormSchema.safeParse({
     title: formValue(formData, "title"),
@@ -75,26 +90,66 @@ async function savePrompt(id: string | null, formData: FormData): Promise<Prompt
     };
   });
 
-  if (id) {
-    await prisma.prompt.update({
-      where: { id },
-      data: {
-        ...promptData,
-        tags: {
-          deleteMany: {},
-          create: tagCreates,
-        },
-      },
+  let savedFiles: Awaited<ReturnType<typeof persistAttachmentFile>>[] = [];
+
+  try {
+    savedFiles = await Promise.all(files.map((file) => persistAttachmentFile(file)));
+  } catch (error) {
+    await Promise.allSettled(savedFiles.map((file) => deleteStoredAttachment(file.storagePath)));
+
+    return validationError(error instanceof Error ? error.message : "Attachments could not be uploaded.", {
+      attachments: error instanceof Error ? error.message : "Attachments could not be uploaded.",
     });
-  } else {
-    await prisma.prompt.create({
-      data: {
-        ...promptData,
-        tags: {
-          create: tagCreates,
+  }
+
+  try {
+    if (id) {
+      const removableAttachments = removeAttachmentIds.length
+        ? await prisma.promptAttachment.findMany({
+            where: {
+              id: { in: removeAttachmentIds },
+              promptId: id,
+            },
+            select: {
+              id: true,
+              storagePath: true,
+            },
+          })
+        : [];
+
+      await prisma.prompt.update({
+        where: { id },
+        data: {
+          ...promptData,
+          tags: {
+            deleteMany: {},
+            create: tagCreates,
+          },
+          attachments: {
+            ...(removeAttachmentIds.length ? { deleteMany: { id: { in: removeAttachmentIds } } } : {}),
+            create: savedFiles,
+          },
         },
-      },
-    });
+      });
+
+      await Promise.allSettled(removableAttachments.map((attachment) => deleteStoredAttachment(attachment.storagePath)));
+      await deletePromptAttachmentDirectoryIfEmpty();
+    } else {
+      await prisma.prompt.create({
+        data: {
+          ...promptData,
+          tags: {
+            create: tagCreates,
+          },
+          attachments: {
+            create: savedFiles,
+          },
+        },
+      });
+    }
+  } catch (error) {
+    await Promise.allSettled(savedFiles.map((file) => deleteStoredAttachment(file.storagePath)));
+    throw error;
   }
 
   revalidatePath("/");
@@ -145,9 +200,17 @@ export async function toggleFavouriteAction(id: string) {
 export async function deletePromptAction(id: string) {
   await requireAdmin();
 
+  const attachments = await prisma.promptAttachment.findMany({
+    where: { promptId: id },
+    select: { storagePath: true },
+  });
+
   await prisma.prompt.delete({
     where: { id },
   });
+
+  await Promise.allSettled(attachments.map((attachment) => deleteStoredAttachment(attachment.storagePath)));
+  await deletePromptAttachmentDirectoryIfEmpty();
 
   revalidatePath("/");
   revalidatePath("/admin");

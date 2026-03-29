@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { CalendarDays, LoaderCircle, Star, X } from "lucide-react";
+import { CalendarDays, Download, LoaderCircle, Paperclip, Star, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { CopyButton } from "@/components/copy-button";
 import { PromptContentRenderer } from "@/components/prompt-content-renderer";
+import { formatFileSize } from "@/lib/attachment-config";
 import type { PromptDetailRecord } from "@/lib/types";
 import { formatPromptType, slugify } from "@/lib/utils";
 
@@ -71,6 +72,21 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
 
   if (!slug) {
     return null;
+  }
+
+  function downloadAllFiles() {
+    if (!prompt?.attachments.length) {
+      return;
+    }
+
+    for (const attachment of prompt.attachments) {
+      const anchor = document.createElement("a");
+      anchor.href = attachment.downloadUrl;
+      anchor.download = attachment.originalName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    }
   }
 
   return (
@@ -156,8 +172,50 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
           {prompt ? (
             <div className="space-y-6">
               <div className="flex flex-wrap items-center justify-end gap-3">
+                {prompt.attachments.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={downloadAllFiles}
+                    className="inline-flex items-center gap-2 rounded-full border border-line/70 px-4 py-2 text-sm font-medium text-foreground/76 transition hover:border-accent/60 hover:text-accent"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download all files
+                  </button>
+                ) : null}
                 <CopyButton text={prompt.contentMarkdown} />
               </div>
+
+              {prompt.attachments.length ? (
+                <section className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Paperclip className="h-4 w-4 text-accent" />
+                    <h3 className="text-lg font-semibold">Attachments</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {prompt.attachments.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="flex flex-col gap-3 rounded-2xl border border-line/60 bg-background/60 px-4 py-4 md:flex-row md:items-center md:justify-between"
+                      >
+                        <div>
+                          <p className="font-medium text-foreground">{attachment.originalName}</p>
+                          <p className="mt-1 text-sm text-muted">
+                            {attachment.contentType} · {formatFileSize(attachment.sizeBytes)}
+                          </p>
+                        </div>
+                        <a
+                          href={attachment.downloadUrl}
+                          download={attachment.originalName}
+                          className="inline-flex items-center justify-center gap-2 rounded-full border border-line/70 px-4 py-2 text-sm font-medium transition hover:border-accent/60 hover:text-accent"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download file
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
 
               <article className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
                 <PromptContentRenderer content={prompt.contentMarkdown} />

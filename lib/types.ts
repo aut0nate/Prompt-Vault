@@ -17,8 +17,18 @@ export type PromptCardRecord = {
   tags: string[];
 };
 
+export type PromptAttachmentRecord = {
+  id: string;
+  fileName: string;
+  originalName: string;
+  contentType: string;
+  sizeBytes: number;
+  downloadUrl: string;
+};
+
 export type PromptDetailRecord = PromptCardRecord & {
   contentMarkdown: string;
+  attachments: PromptAttachmentRecord[];
 };
 
 export type PromptQueryState = {
@@ -40,5 +50,7 @@ export type PromptFormState = {
   success: boolean;
   message: string;
   redirectTo?: string;
-  errors?: Partial<Record<"title" | "summary" | "contentMarkdown" | "category" | "tags" | "type", string>>;
+  errors?: Partial<
+    Record<"title" | "summary" | "contentMarkdown" | "category" | "tags" | "type" | "attachments", string>
+  >;
 };

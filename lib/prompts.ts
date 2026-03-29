@@ -1,5 +1,6 @@
 import { Prisma, PromptType } from "@prisma/client";
 
+import { mapAttachmentRecord } from "@/lib/attachments";
 import { prisma } from "@/lib/prisma";
 import { promptQuerySchema } from "@/lib/validation";
 import type { PromptCardRecord, PromptDetailRecord, PromptListResult, PromptQueryState } from "@/lib/types";
@@ -27,6 +28,16 @@ const promptSelect = {
 const promptDetailSelect = {
   ...promptSelect,
   contentMarkdown: true,
+  attachments: {
+    select: {
+      id: true,
+      fileName: true,
+      originalName: true,
+      contentType: true,
+      sizeBytes: true,
+    },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+  },
 } satisfies Prisma.PromptSelect;
 
 function mapPrompt(
@@ -54,6 +65,7 @@ function mapPromptDetail(
   return {
     ...mapPrompt(record, isAdmin),
     contentMarkdown: record.contentMarkdown,
+    attachments: record.attachments.map(mapAttachmentRecord),
   };
 }
 

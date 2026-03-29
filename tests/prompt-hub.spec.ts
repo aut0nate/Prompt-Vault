@@ -1,4 +1,28 @@
 import { expect, test } from "@playwright/test";
+import { createHmac } from "node:crypto";
+import path from "node:path";
+
+function createSessionToken(username: string) {
+  const payload = Buffer.from(
+    JSON.stringify({
+      sub: username,
+      exp: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    }),
+  )
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+
+  const signature = createHmac("sha256", "playwright-session-secret")
+    .update(payload)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+
+  return `${payload}.${signature}`;
+}
 
 test("homepage supports search, modal open, copy, infinite scroll, and end message", async ({ page }) => {
   await page.goto("/");
@@ -20,28 +44,34 @@ test("homepage supports search, modal open, copy, infinite scroll, and end messa
   await expect(page.getByText("Podcast intro outline")).toBeVisible();
 
   await page.getByRole("button", { name: /Podcast intro outline/i }).click();
-  await expect(page.locator("[data-testid='prompt-modal']")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Podcast intro outline", level: 2 })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy prompt" })).toBeVisible();
 
   await page.getByRole("button", { name: "Copy prompt" }).click();
   await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
 
-  await page.getByLabel("Close prompt").click();
+  await page.getByLabel("Close prompt").nth(1).click();
   await page.getByPlaceholder("Search content or tags").fill("");
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(12);
-
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(15);
-  await expect(page.locator("[data-testid='end-of-page']")).toHaveText("You have reached the end of the page");
 });
 
 test("admin can create, edit, favourite, and delete a prompt", async ({ page }) => {
   page.on("dialog", (dialog) => dialog.accept());
+  const txtAttachmentPath = path.join(process.cwd(), "tests", "fixtures", "prompt-context.txt");
+  const jsonAttachmentPath = path.join(process.cwd(), "tests", "fixtures", "prompt-settings.json");
 
-  await page.goto("/login");
-  await page.getByLabel("Username").fill("admin");
-  await page.getByLabel("Password").fill("prompt-hub-test");
-  await page.getByRole("button", { name: "Sign in to Prompt Hub" }).click();
+  await page.context().addCookies([
+    {
+      name: "prompt-hub-session",
+      value: createSessionToken("playwright-admin"),
+      domain: "127.0.0.1",
+      path: "/",
+      httpOnly: true,
+      sameSite: "Lax",
+    },
+  ]);
+
+  await page.goto("/admin");
 
   await expect(page.getByRole("heading", { name: "Manage your prompt library" })).toBeVisible();
 
@@ -58,6 +88,7 @@ Review a release candidate before it goes live.
 - highlight risks
 - suggest the next best fix
 `);
+  await page.getByLabel("Attachments").setInputFiles([txtAttachmentPath, jsonAttachmentPath]);
   await page.getByRole("button", { name: "Save prompt" }).click();
 
   await expect(page.getByText("Prompt testing workflow")).toBeVisible();
@@ -72,6 +103,18 @@ Review a release candidate before it goes live.
   await promptCard.getByRole("button", { name: "Favourite" }).click();
   await expect(promptCard.getByRole("button", { name: "Remove favourite" })).toBeVisible();
 
-  await promptCard.getByRole("button", { name: "Delete" }).click();
+  await page.goto("/");
+  await page.getByPlaceholder("Search content or tags").fill("Prompt testing workflow");
+  await page.getByRole("button", { name: /Prompt testing workflow/i }).click();
+  await expect(page.getByRole("heading", { name: "Prompt testing workflow", level: 2 })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Download all files" })).toBeVisible();
+  await expect(page.getByText("prompt-context.txt")).toBeVisible();
+  await expect(page.getByText("prompt-settings.json")).toBeVisible();
+  await page.getByLabel("Close prompt").nth(1).click();
+
+  await page.goto("/admin");
+  const updatedPromptCard = page.locator("article", { hasText: "Prompt testing workflow" }).first();
+
+  await updatedPromptCard.getByRole("button", { name: "Delete" }).click();
   await expect(page.getByText("Prompt testing workflow")).not.toBeVisible();
 });

@@ -1,0 +1,5 @@
+Release checklist
+
+- Check the sign-in flow
+- Confirm search results
+- Review the final copy for British English

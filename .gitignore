@@ -12,4 +12,5 @@ coverage
 *.db-journal
 prisma/dev.db
 prisma/dev.db-journal
+storage/
 .DS_Store

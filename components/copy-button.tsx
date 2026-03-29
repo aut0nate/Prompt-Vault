@@ -11,9 +11,30 @@ type CopyButtonProps = {
 export function CopyButton({ text, className }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
+  function copyWithSelectionFallback() {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+      document.execCommand("copy");
+      setCopied(true);
+    } finally {
+      textarea.remove();
+    }
+  }
+
   async function handleCopy() {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+    } catch {
+      copyWithSelectionFallback();
+    }
 
     window.setTimeout(() => {
       setCopied(false);

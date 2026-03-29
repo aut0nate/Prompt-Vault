@@ -26,6 +26,7 @@ model Prompt {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   tags            PromptTag[]
+  attachments     PromptAttachment[]
 }
 
 model Tag {
@@ -44,4 +45,18 @@ model PromptTag {
   tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([promptId, tagId])
+}
+
+model PromptAttachment {
+  id           String   @id @default(cuid())
+  promptId     String
+  prompt       Prompt   @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  fileName     String
+  originalName String
+  contentType  String
+  sizeBytes    Int
+  storagePath  String   @unique
+  createdAt    DateTime @default(now())
+
+  @@index([promptId, createdAt])
 }
