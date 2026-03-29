@@ -99,6 +99,6 @@ docker compose down
 
 Notes:
 
-- The SQLite database is stored in a named Docker volume mounted at `/app/prisma`.
-- Docker uses an absolute SQLite path inside the container, `/app/prisma/dev.db`, so build-time and runtime Prisma point at the same database file.
+- The SQLite database is stored in a named Docker volume mounted at `/app/data`.
+- Docker uses an absolute SQLite path inside the container, `/app/data/dev.db`, so build-time and runtime Prisma point at the same database file without persisting the application schema directory.
 - The runtime image installs OpenSSL for Prisma, carries production-only Node dependencies, and runs as a non-root user.

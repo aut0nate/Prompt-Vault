@@ -4,14 +4,15 @@ services:
     build:
       context: .
       args:
-        DATABASE_URL: file:/app/prisma/dev.db
+        DATABASE_URL: file:/app/data/dev.db
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      DATABASE_URL: file:/app/prisma/dev.db
+      DATABASE_URL: file:/app/data/dev.db
+      ATTACHMENTS_DIR: /app/data/prompt-attachments
     volumes:
-      - prompt-hub-data:/app/prisma
+      - prompt-hub-data:/app/data
     networks:
       - edge-net
     logging:

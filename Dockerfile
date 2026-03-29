@@ -18,10 +18,11 @@ RUN npm ci --omit=dev \
 
 FROM base AS builder
 WORKDIR /app
-ARG DATABASE_URL="file:/app/prisma/dev.db"
+ARG DATABASE_URL="file:/app/data/dev.db"
 ENV DATABASE_URL=${DATABASE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN mkdir -p /app/data
 RUN mkdir -p public
 RUN npx prisma generate
 RUN npm run build
@@ -37,6 +38,7 @@ COPY --from=prod-deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 USER nextjs
 EXPOSE 3000
