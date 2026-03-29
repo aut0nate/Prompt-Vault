@@ -185,6 +185,10 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
                 <CopyButton text={prompt.contentMarkdown} />
               </div>
 
+              <article className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
+                <PromptContentRenderer content={prompt.contentMarkdown} />
+              </article>
+
               {prompt.attachments.length ? (
                 <section className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
                   <div className="mb-4 flex items-center gap-2">
@@ -216,10 +220,6 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
                   </div>
                 </section>
               ) : null}
-
-              <article className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
-                <PromptContentRenderer content={prompt.contentMarkdown} />
-              </article>
             </div>
           ) : null}
         </div>
