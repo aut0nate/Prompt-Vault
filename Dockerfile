@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim AS base
 WORKDIR /app
 RUN apt-get update -y \
   && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends ca-certificates openssl \
+  && apt-get install -y --no-install-recommends ca-certificates openssl sqlite3 \
   && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps
@@ -36,7 +36,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=prod-deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 USER nextjs
 EXPOSE 3000
-CMD ["node", "node_modules/next/dist/bin/next", "start", "-H", "0.0.0.0", "-p", "3000"]
+CMD ["sh", "-c", "node scripts/db-push.mjs && exec node node_modules/next/dist/bin/next start -H 0.0.0.0 -p 3000"]
