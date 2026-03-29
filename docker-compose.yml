@@ -4,7 +4,7 @@ services:
     build:
       context: .
       args:
-        DATABASE_URL: ${DATABASE_URL}
+        DATABASE_URL: file:/app/prisma/dev.db
     restart: unless-stopped
     env_file:
       - .env
