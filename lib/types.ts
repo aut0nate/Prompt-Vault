@@ -25,6 +25,7 @@ export type PromptQueryState = {
   search: string;
   type: PromptTypeFilter;
   sort: PromptSortOption;
+  category: string;
   tags: string[];
   favouritesOnly: boolean;
 };
@@ -34,6 +35,7 @@ export type PromptListResult = {
   nextCursor: string | null;
   totalCount: number;
   availableTags: string[];
+  availableCategories: string[];
 };
 
 export type PromptFormState = {

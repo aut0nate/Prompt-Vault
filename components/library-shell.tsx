@@ -21,6 +21,7 @@ export function LibraryShell({ initialData, initialListKey, isAdmin }: LibrarySh
   const [items, setItems] = useState(initialData.items);
   const [nextCursor, setNextCursor] = useState(initialData.nextCursor);
   const [availableTags, setAvailableTags] = useState(initialData.availableTags);
+  const [availableCategories, setAvailableCategories] = useState(initialData.availableCategories);
   const [totalCount, setTotalCount] = useState(initialData.totalCount);
   const [searchDraft, setSearchDraft] = useState(searchParams.get("search") ?? "");
   const [isRefreshing, startTransition] = useTransition();
@@ -32,6 +33,7 @@ export function LibraryShell({ initialData, initialListKey, isAdmin }: LibrarySh
   const deferredSearch = useDeferredValue(searchDraft);
   const promptSlug = searchParams.get("prompt");
   const selectedType = searchParams.get("type") ?? "all";
+  const selectedCategory = searchParams.get("category") ?? "";
   const selectedSort = searchParams.get("sort") ?? "newest";
   const favouritesOnly = searchParams.get("favourites") === "1";
   const selectedTags = (searchParams.get("tags") ?? "")
@@ -93,6 +95,7 @@ export function LibraryShell({ initialData, initialListKey, isAdmin }: LibrarySh
       setItems(data.items);
       setNextCursor(data.nextCursor);
       setAvailableTags(data.availableTags);
+      setAvailableCategories(data.availableCategories);
       setTotalCount(data.totalCount);
     }
 
@@ -194,14 +197,15 @@ export function LibraryShell({ initialData, initialListKey, isAdmin }: LibrarySh
   return (
     <>
       <div className={promptSlug ? "pointer-events-none blur-md transition" : "transition"}>
-        <section className="mb-10 grid gap-3 rounded-[2rem] border border-line/70 bg-panel/60 p-4 shadow-[0_20px_70px_rgba(0,0,0,0.05)] backdrop-blur-sm xl:grid-cols-[minmax(0,1.1fr)_minmax(240px,1.15fr)_170px_170px_auto] xl:items-end">
+        <section className="mb-10 grid gap-3 rounded-[2rem] border border-line/70 bg-panel/60 p-4 shadow-[0_20px_70px_rgba(0,0,0,0.05)] backdrop-blur-sm xl:grid-cols-[minmax(0,1.05fr)_minmax(220px,1.15fr)_160px_180px_170px_auto] xl:items-end">
           <div className="space-y-2 pr-2 xl:max-w-sm">
             <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-muted">
               <SlidersHorizontal className="h-4 w-4" />
               Refine prompts
             </p>
             <p className="text-sm leading-6 text-foreground/68">
-              Search by content or tags, filter by type, sort by date, and keep your favourite prompts close to hand.
+              Search by content or tags, filter by type and category, sort by date, and keep your favourite prompts
+              close to hand.
             </p>
           </div>
 
@@ -235,6 +239,29 @@ export function LibraryShell({ initialData, initialListKey, isAdmin }: LibrarySh
             <option value="image">Image</option>
             <option value="video">Video</option>
             <option value="audio">Audio</option>
+          </select>
+
+          <select
+            value={selectedCategory}
+            onChange={(event) =>
+              replaceFilters((params) => {
+                const value = event.target.value;
+
+                if (value) {
+                  params.set("category", value);
+                } else {
+                  params.delete("category");
+                }
+              })
+            }
+            className="h-11 min-w-0 rounded-[1.1rem] border border-line/60 bg-background/72 px-3 text-sm outline-none transition focus:border-accent/65"
+          >
+            <option value="">All categories</option>
+            {availableCategories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </select>
 
           <select

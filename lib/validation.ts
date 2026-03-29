@@ -29,6 +29,7 @@ export const promptQuerySchema = z.object({
   search: z.string().trim().default(""),
   type: z.enum(["all", "text", "image", "video", "audio"]).default("all"),
   sort: z.enum(["newest", "oldest"]).default("newest"),
+  category: z.string().trim().default(""),
   tags: z
     .string()
     .default("")

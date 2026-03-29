@@ -30,6 +30,12 @@ test("homepage supports search, modal open, copy, infinite scroll, and end messa
   await page.getByPlaceholder("Search content or tags").fill("");
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(12);
 
+  await page.getByRole("combobox").nth(1).selectOption("Prompt Engineering");
+  await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(1);
+  await expect(page.getByText("Prompt critique and improvement pass")).toBeVisible();
+  await page.getByRole("combobox").nth(1).selectOption("");
+  await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(12);
+
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(15);
   await expect(page.locator("[data-testid='end-of-page']")).toHaveText("You have reached the end of the page");
