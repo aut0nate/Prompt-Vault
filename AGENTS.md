@@ -1,8 +1,8 @@
-# Prompt Hub Agent Guide
+# Prompt Vault Agent Guide
 
 ## Project Overview
 
-Prompt Hub is a personal prompt library for saving, organising, searching, favouriting, and reusing LLM prompts.
+Prompt Vault is a personal prompt library for saving, organising, searching, favouriting, and reusing LLM prompts.
 
 The application is built with:
 
