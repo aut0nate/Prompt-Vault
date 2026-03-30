@@ -99,6 +99,23 @@ docker compose down
 
 Notes:
 
-- The SQLite database is stored in a named Docker volume mounted at `/app/data`.
-- Docker uses an absolute SQLite path inside the container, `/app/data/dev.db`, so build-time and runtime Prisma point at the same database file without persisting the application schema directory.
+- The SQLite database and prompt attachments are stored in the local `storage/` folder and mounted into the container at `/app/data`.
+- The main database file lives at `storage/dev.db`.
+- Prompt attachments live under `storage/prompt-attachments/`.
+- Docker uses an absolute SQLite path inside the container, `/app/data/dev.db`, so build-time and runtime Prisma point at the same database file.
 - The runtime image installs OpenSSL for Prisma, carries production-only Node dependencies, and runs as a non-root user.
+
+## Backups and persistence
+
+- The `storage/` folder is ignored by git and should be treated as local application data.
+- Rebuilding or recreating the container will not remove your prompts as long as `storage/` remains in place.
+- Do not run `docker compose down -v` if you want to keep your data.
+- Back up Prompt Vault by copying the `storage/` folder to another location.
+
+Example backup command:
+
+```bash
+cp -R storage "storage-backup-$(date +%Y-%m-%d)"
+```
+
+If you already have data in the old Docker volume, copy it into `storage/` before switching fully to the new setup.

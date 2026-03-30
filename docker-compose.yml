@@ -12,7 +12,7 @@ services:
       DATABASE_URL: file:/app/data/dev.db
       ATTACHMENTS_DIR: /app/data/prompt-attachments
     volumes:
-      - prompt-vault-data:/app/data
+      - ./storage:/app/data
     networks:
       - edge-net
     logging:
@@ -21,9 +21,6 @@ services:
         max-file: "3"
     labels:
       com.centurylinklabs.watchtower.enable: "true"
-
-volumes:
-  prompt-vault-data:
 
 networks:
   edge-net:
