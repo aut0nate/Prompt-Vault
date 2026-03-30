@@ -1,6 +1,6 @@
-# Prompt Hub
+# Prompt Vault
 
-Prompt Hub is a simple personal prompt library for saving, organising, searching, favouriting, and reusing LLM prompts.
+Prompt Vault is a simple personal prompt library for saving, organising, searching, favouriting, and reusing LLM prompts.
 This application was created using OpenAI Codex.
 
 ## Stack
@@ -62,7 +62,7 @@ This application was created using OpenAI Codex.
 
 ## Docker
 
-Run Prompt Hub with Docker for local testing:
+Run Prompt Vault with Docker for local testing:
 
 ```bash
 cp .env.example .env

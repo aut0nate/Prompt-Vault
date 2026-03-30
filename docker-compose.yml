@@ -1,6 +1,6 @@
 services:
-  prompt-hub:
-    container_name: prompt-hub
+  prompt-vault:
+    container_name: prompt-vault
     build:
       context: .
       args:
@@ -12,7 +12,7 @@ services:
       DATABASE_URL: file:/app/data/dev.db
       ATTACHMENTS_DIR: /app/data/prompt-attachments
     volumes:
-      - prompt-hub-data:/app/data
+      - prompt-vault-data:/app/data
     networks:
       - edge-net
     logging:
@@ -23,7 +23,7 @@ services:
       com.centurylinklabs.watchtower.enable: "true"
 
 volumes:
-  prompt-hub-data:
+  prompt-vault-data:
 
 networks:
   edge-net:

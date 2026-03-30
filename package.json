@@ -1,5 +1,5 @@
 {
-  "name": "prompt-hub",
+  "name": "prompt-vault",
   "version": "1.0.0",
   "private": true,
   "description": "A personal prompt library for saving and organising useful LLM prompts.",

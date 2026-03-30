@@ -1,4 +1,4 @@
-export const GITHUB_STATE_COOKIE = "prompt-hub-github-state";
+export const GITHUB_STATE_COOKIE = "prompt-vault-github-state";
 
 type GitHubUser = {
   id: number;

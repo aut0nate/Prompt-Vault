@@ -1,4 +1,4 @@
-export const SESSION_COOKIE_NAME = "prompt-hub-session";
+export const SESSION_COOKIE_NAME = "prompt-vault-session";
 
 const encoder = new TextEncoder();
 const sessionLifetimeMs = 1000 * 60 * 60 * 24 * 7;

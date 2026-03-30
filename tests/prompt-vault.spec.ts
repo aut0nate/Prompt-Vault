@@ -27,7 +27,7 @@ function createSessionToken(username: string) {
 test("homepage supports search, modal open, copy, infinite scroll, and end message", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Prompt Hub" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Prompt Vault" })).toBeVisible();
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(12);
   await expect(page.locator("[data-testid='homepage-tag']")).toHaveCount(20);
 
@@ -62,7 +62,7 @@ test("admin can create, edit, favourite, and delete a prompt", async ({ page }) 
 
   await page.context().addCookies([
     {
-      name: "prompt-hub-session",
+      name: "prompt-vault-session",
       value: createSessionToken("playwright-admin"),
       domain: "127.0.0.1",
       path: "/",

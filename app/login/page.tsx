@@ -48,7 +48,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <section className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[2.5rem] border border-line/70 bg-panel/65 p-8 shadow-[0_20px_70px_rgba(0,0,0,0.06)]">
           <p className="text-sm uppercase tracking-[0.28em] text-muted">Private editing access</p>
-          <h1 className="mt-4 text-4xl font-semibold md:text-6xl">Sign in to manage Prompt Hub</h1>
+          <h1 className="mt-4 text-4xl font-semibold md:text-6xl">Sign in to manage Prompt Vault</h1>
           <p className="mt-6 max-w-2xl text-base leading-8 text-foreground/72">
             The library can be browsed publicly, but editing access is restricted to an approved GitHub account.
           </p>

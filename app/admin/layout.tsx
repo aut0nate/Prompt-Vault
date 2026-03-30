@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
     <main className="mx-auto min-h-screen max-w-7xl px-4 py-10 md:px-8 md:py-12">
       <header className="mb-10 flex flex-col gap-4 rounded-[2rem] border border-line/70 bg-panel/70 p-6 shadow-[0_20px_70px_rgba(0,0,0,0.06)] md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.28em] text-muted">Prompt Hub admin</p>
+          <p className="text-sm uppercase tracking-[0.28em] text-muted">Prompt Vault admin</p>
           <h1 className="mt-3 text-3xl font-semibold md:text-4xl">Manage your prompt library</h1>
         </div>
 

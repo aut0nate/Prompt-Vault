@@ -37,14 +37,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </p>
           <div className="flex items-center gap-4 md:gap-5">
             <Image
-              src="/prompt-hub-logo.svg"
+              src="/prompt-vault-logo.svg"
               alt=""
               aria-hidden="true"
               width={80}
               height={80}
               className="h-16 w-16 shrink-0 md:h-20 md:w-20"
             />
-            <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">Prompt Hub</h1>
+            <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">Prompt Vault</h1>
           </div>
           <p className="mt-5 max-w-2xl text-base leading-8 text-foreground/72 md:text-lg">
             Keep your best prompts in one elegant place, search them quickly, and reopen full examples whenever you

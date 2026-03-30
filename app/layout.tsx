@@ -5,7 +5,7 @@ import { Providers } from "@/components/providers";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
-  title: "Prompt Hub",
+  title: "Prompt Vault",
   description: "A beautiful personal prompt library for storing and reusing your best LLM prompts.",
 };
 
