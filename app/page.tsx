@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { LibraryShell } from "@/components/library-shell";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -7,6 +8,9 @@ import { isAuthenticated } from "@/lib/auth";
 import { getPromptList } from "@/lib/prompts";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Prompt Vault",
+};
 
 type HomePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
