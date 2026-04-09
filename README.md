@@ -3,6 +3,8 @@
 Prompt Vault is a simple personal prompt library for saving, organising, searching, favouriting, and reusing LLM prompts.
 This application was created using OpenAI Codex.
 
+![Login](./images/Prompt-Vault-Home.png)
+
 ## Stack
 
 - Next.js with the App Router
