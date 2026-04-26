@@ -33,6 +33,8 @@ The repository is intended for local development first, then Docker packaging an
 - `scripts/` - Utility scripts for local setup and maintenance.
 - `tests/` - Playwright end-to-end tests.
 - `Dockerfile` and `docker-compose.yml` - Container build and local Docker runtime.
+- `docker-compose.prod.yml` - VPS runtime that pulls the published Docker Hub image.
+- `.github/workflows/ci.yml` - GitHub Actions workflow for tests, Docker builds, smoke testing, and image publishing.
 
 ## Common Commands
 
@@ -49,6 +51,8 @@ Use these commands from the repository root:
 - `npm run hash-password -- "password"` - Generate a password hash for `ADMIN_PASSWORD_HASH`.
 - `npm run test:e2e` - Run Playwright end-to-end tests.
 - `docker compose up --build` - Build and run the app in Docker.
+- `docker compose -f docker-compose.prod.yml pull prompt-vault` - Pull the latest published production image on the VPS.
+- `docker compose -f docker-compose.prod.yml up -d` - Restart the published production image on the VPS.
 
 ## Local Development
 
@@ -66,6 +70,7 @@ The admin login lives at `/login` and the admin dashboard lives at `/admin`.
 - Run `npm run lint` after code changes that affect application logic or UI.
 - Run `npm run test:e2e` when changing user flows, authentication, prompt management, search, or modal behaviour.
 - The Playwright tests expect a seeded database and a working admin login.
+- CI must pass linting, production build, Playwright tests, Docker image build, and the Docker smoke test before a change is considered deployable.
 
 ## Database Notes
 
@@ -78,6 +83,8 @@ The admin login lives at `/login` and the admin dashboard lives at `/admin`.
 
 - Treat `.env` as local-only.
 - Never commit secrets, password hashes, or private credentials.
+- Store Docker Hub credentials as GitHub repository secrets named `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`.
+- Use Docker Hub access tokens rather than account passwords.
 - Review auth-related changes carefully, especially middleware, login actions, and admin routes.
 - Be careful when modifying API routes that expose prompt content or allow write operations.
 
@@ -85,8 +92,20 @@ The admin login lives at `/login` and the admin dashboard lives at `/admin`.
 
 - The project is already containerised.
 - `Dockerfile` builds the app for production.
-- `docker-compose.yml` mounts a named volume for the SQLite database at `/app/prisma`.
+- `docker-compose.yml` builds locally and mounts `./storage` to `/app/data`.
+- `docker-compose.prod.yml` pulls `aut0nate/prompt-vault:latest` and mounts `./storage` to `/app/data`.
+- Published images are tagged as `aut0nate/prompt-vault:latest` and `aut0nate/prompt-vault:<git-sha>`.
+- Keep SQLite data and prompt attachments outside the image in the persistent `storage/` mount.
 - If you change database paths or build steps, update both the Docker files and the README.
+
+## CI/CD Notes
+
+- Pull requests and branch pushes run the GitHub Actions CI workflow.
+- Pushes to `main` publish the Docker image to Docker Hub after all checks pass.
+- Production deployment is currently manual from the VPS: pull the image, restart Compose, then inspect logs.
+- Prefer pull requests and branch protection for `main` once the workflow is stable.
+- Keep the reverse proxy outside this app stack; this app should only expose the Next.js service to the existing Docker network.
+- Back up `storage/` before deployments that touch database behaviour.
 
 ## Style Notes
 

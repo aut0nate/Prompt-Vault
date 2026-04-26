@@ -32,12 +32,12 @@ test("homepage supports search, modal open, copy, infinite scroll, and end messa
   await expect(page.locator("[data-testid='homepage-tag']")).toHaveCount(20);
 
   const homepageTags = page.locator("[data-testid='homepage-tag']");
-  await expect(homepageTags.nth(0)).toHaveText("audio");
-  await expect(homepageTags.nth(1)).toHaveText("editing");
-  await expect(homepageTags.nth(2)).toHaveText("image generation");
-  await expect(homepageTags.nth(3)).toHaveText("script");
-  await expect(homepageTags.nth(4)).toHaveText("video");
-  await expect(homepageTags.nth(5)).toHaveText("writing");
+  await expect(homepageTags.nth(0)).toHaveText("advertising");
+  await expect(homepageTags.nth(1)).toHaveText("audio");
+  await expect(homepageTags.nth(2)).toHaveText("brand voice");
+  await expect(homepageTags.nth(3)).toHaveText("campaigns");
+  await expect(homepageTags.nth(4)).toHaveText("case study");
+  await expect(homepageTags.nth(5)).toHaveText("copywriting");
 
   await page.getByPlaceholder("Search content or tags").fill("podcast");
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(1);

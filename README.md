@@ -92,6 +92,80 @@ Notes:
 - Docker uses an absolute SQLite path inside the container, `/app/data/dev.db`, so build-time and runtime Prisma point at the same database file.
 - The container prepares the mounted `storage/` folder on startup, then runs the application as the non-root `nextjs` user.
 
+## CI/CD
+
+This repository uses GitHub Actions to test changes, build the production Docker image, and publish it to the public Docker Hub repository at `aut0nate/prompt-vault`.
+
+The workflow runs on pull requests and branch pushes:
+
+1. Install dependencies with `npm ci`.
+2. Run linting.
+3. Build the Next.js application.
+4. Run Playwright end-to-end tests.
+5. Build the Docker image.
+6. Start the image and run a smoke test against the homepage.
+
+When a push lands on `main`, the workflow also publishes the image to Docker Hub as:
+
+- `aut0nate/prompt-vault:latest`
+- `aut0nate/prompt-vault:<git-commit-sha>`
+
+The commit SHA tag is useful for rollbacks because it points at one exact build.
+
+### GitHub Secrets
+
+Add these repository secrets in GitHub before relying on publishing from `main`:
+
+- `DOCKERHUB_USERNAME` - your Docker Hub username.
+- `DOCKERHUB_TOKEN` - a Docker Hub access token with permission to push to `aut0nate/prompt-vault`.
+
+Use a Docker Hub access token rather than your Docker Hub password. The image repository is public, but GitHub Actions still needs authenticated push access.
+
+## VPS Deployment
+
+The VPS should pull the tested image from Docker Hub rather than building the app directly on the server.
+
+Use `docker-compose.prod.yml` on the VPS. It expects:
+
+- The public Docker Hub image `aut0nate/prompt-vault:latest`.
+- A local `.env` file on the VPS containing production secrets.
+- A local `storage/` directory for the SQLite database and prompt attachments.
+- An existing external Docker network called `edge-net` for your reverse proxy.
+
+Example deployment flow on the VPS:
+
+```bash
+docker compose -f docker-compose.prod.yml pull prompt-vault
+docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml logs -f prompt-vault
+```
+
+Because the image is public, the VPS does not need `docker login` to pull it. Keep production secrets only in the VPS `.env` file. Do not commit that file to GitHub.
+
+Before releases that touch database behaviour, back up the persistent storage directory:
+
+```bash
+cp -R storage "storage-backup-$(date +%Y-%m-%d)"
+```
+
+After deployment, verify:
+
+- The public homepage loads.
+- `/login` loads.
+- GitHub login works with the production callback URL.
+- Existing prompts and attachments are still present.
+
+## CI/CD Best Practices
+
+- Prefer pull requests so CI runs before code reaches `main`.
+- Enable branch protection for `main` after the workflow is passing reliably.
+- Keep secrets in GitHub Actions secrets or the VPS `.env`, never in code or Docker images.
+- Keep SQLite data and uploaded files in the persistent `storage/` mount, not inside the image.
+- Use immutable SHA image tags for rollback, even when deploying `latest`.
+- Keep the reverse proxy separate from the app container.
+- Review Dependabot pull requests regularly for npm and GitHub Actions updates.
+- Consider automatic deployment later, after the manual pull-and-restart process is comfortable.
+
 ## Admin Area
 
 - Public visitors can browse prompts.

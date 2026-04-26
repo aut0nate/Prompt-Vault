@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: aut0nate/prompt-vault
+  CI_IMAGE_TAG: prompt-vault:ci
+
+jobs:
+  test-build-and-publish:
+    name: Test, build, and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: file:${{ github.workspace }}/prisma/ci-build.db
+          APP_ORIGIN: http://127.0.0.1:3000
+          SESSION_SECRET: ci-build-session-secret
+          GITHUB_CLIENT_ID: ci-github-client-id
+          GITHUB_CLIENT_SECRET: ci-github-client-secret
+          GITHUB_ALLOWED_USERNAME: ci-user
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image for CI
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ${{ env.CI_IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=file:/app/data/dev.db
+
+      - name: Smoke test Docker image
+        run: |
+          set -euo pipefail
+          docker run --detach --name prompt-vault-smoke \
+            --publish 3000:3000 \
+            --env DATABASE_URL=file:/app/data/smoke.db \
+            --env APP_ORIGIN=http://127.0.0.1:3000 \
+            --env SESSION_SECRET=ci-smoke-session-secret \
+            --env GITHUB_CLIENT_ID=ci-github-client-id \
+            --env GITHUB_CLIENT_SECRET=ci-github-client-secret \
+            --env GITHUB_ALLOWED_USERNAME=ci-user \
+            "${CI_IMAGE_TAG}"
+
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              docker logs prompt-vault-smoke
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs prompt-vault-smoke
+          exit 1
+
+      - name: Stop smoke test container
+        if: always()
+        run: docker rm --force prompt-vault-smoke || true
+
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish Docker image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            DATABASE_URL=file:/app/data/dev.db
