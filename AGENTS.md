@@ -46,6 +46,7 @@ Use these commands from the repository root:
 - `npm run build` - Generate Prisma client and build the production app.
 - `npm run start` - Run the built production app.
 - `npm run lint` - Run linting.
+- `npm run password:hash -- "your-strong-password"` - Generate an escaped bcrypt hash for `ADMIN_PASSWORD_HASH`.
 - `npm run prisma:generate` - Regenerate the Prisma client.
 - `npm run db:push` - Push the Prisma schema to the local database.
 - `npm run db:seed` - Seed the local database.
@@ -58,7 +59,7 @@ Use these commands from the repository root:
 
 1. Install dependencies.
 2. Create `.env` from `.env.example`.
-3. Set `DATABASE_URL`, `APP_ORIGIN`, `SESSION_SECRET`, and `ADMIN_PASSWORD`.
+3. Set `DATABASE_URL`, `APP_ORIGIN`, `SESSION_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD_HASH`.
 4. Run Prisma generate and database setup.
 5. Start the app with `npm run dev`.
 

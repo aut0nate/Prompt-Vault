@@ -43,9 +43,8 @@ jobs:
           DATABASE_URL: file:${{ github.workspace }}/prisma/ci-build.db
           APP_ORIGIN: http://127.0.0.1:3000
           SESSION_SECRET: ci-build-session-secret
-          GITHUB_CLIENT_ID: ci-github-client-id
-          GITHUB_CLIENT_SECRET: ci-github-client-secret
-          GITHUB_ALLOWED_USERNAME: ci-user
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD_HASH: '\$2b\$12\$HhEbGLqaBRtGrsuXjIw.xOvxq9Mwk5k2I3HTl1FIAuFjpfSxr/nNG'
 
       - name: Run end-to-end tests
         run: npm run test:e2e
@@ -63,9 +62,8 @@ jobs:
             --env DATABASE_URL=file:/app/data/smoke.db \
             --env APP_ORIGIN=http://127.0.0.1:3000 \
             --env SESSION_SECRET=ci-smoke-session-secret \
-            --env GITHUB_CLIENT_ID=ci-github-client-id \
-            --env GITHUB_CLIENT_SECRET=ci-github-client-secret \
-            --env GITHUB_ALLOWED_USERNAME=ci-user \
+            --env ADMIN_USERNAME=ci-admin \
+            --env ADMIN_PASSWORD_HASH=\$2b\$12\$HhEbGLqaBRtGrsuXjIw.xOvxq9Mwk5k2I3HTl1FIAuFjpfSxr/nNG \
             "${CI_IMAGE_TAG}"
 
           for attempt in {1..30}; do

@@ -1,4 +1,5 @@
 import path from "node:path";
+import bcrypt from "bcrypt";
 import { defineConfig, devices } from "@playwright/test";
 
 const testDatabaseUrl = `file:${path.resolve("prisma/playwright.db")}`;
@@ -18,7 +19,8 @@ export default defineConfig({
     env: {
       DATABASE_URL: testDatabaseUrl,
       SESSION_SECRET: "playwright-session-secret",
-      ADMIN_PASSWORD: "playwright-admin-password",
+      ADMIN_USERNAME: "playwright-admin",
+      ADMIN_PASSWORD_HASH: bcrypt.hashSync("playwright-admin-password", 12).replaceAll("$", "\\$"),
     },
   },
   projects: [

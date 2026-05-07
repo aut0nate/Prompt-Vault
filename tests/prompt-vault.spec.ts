@@ -6,7 +6,7 @@ function createSessionToken(username: string) {
   const payload = Buffer.from(
     JSON.stringify({
       sub: username,
-      exp: Date.now() + 1000 * 60 * 60 * 24 * 7,
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 14,
     }),
   )
     .toString("base64")
@@ -61,20 +61,20 @@ test("homepage supports search, modal open, copy, infinite scroll, and end messa
 test("admin can sign in with the configured password", async ({ page }) => {
   await page.goto("/login");
 
-  await expect(page.getByRole("heading", { name: "Sign in to your library" })).toBeVisible();
+  await expect(page.getByText("Sign in to your library")).toBeVisible();
   await expect(page.getByText("Prompt Vault")).toBeVisible();
 
-  await page.getByLabel("Username").fill("arkadmin");
+  await page.getByLabel("Username").fill("playwright-admin");
   await page.getByLabel("Password").fill("wrong-password");
-  await page.getByRole("button", { name: "Log in" }).click();
-  await expect(page.getByText("The username or password is incorrect.")).toBeVisible();
+  await page.getByRole("button", { name: "Log In" }).click();
+  await expect(page.getByText("Those login details did not work.")).toBeVisible();
 
-  await page.getByLabel("Username").fill("arkadmin");
+  await page.getByLabel("Username").fill("playwright-admin");
   await page.getByLabel("Password").fill("playwright-admin-password");
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Log In" }).click();
 
   await expect(page).toHaveURL("/admin");
-  await expect(page.getByRole("heading", { name: "Manage your prompt library" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Manage Prompts" })).toBeVisible();
 });
 
 test("admin can create, edit, favourite, and delete a prompt", async ({ page }) => {
@@ -89,13 +89,13 @@ test("admin can create, edit, favourite, and delete a prompt", async ({ page }) 
       domain: "127.0.0.1",
       path: "/",
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "Strict",
     },
   ]);
 
   await page.goto("/admin");
 
-  await expect(page.getByRole("heading", { name: "Manage your prompt library" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Manage Prompts" })).toBeVisible();
 
   await page.getByRole("link", { name: "Add prompt" }).click();
   await page.getByRole("button", { name: "Marketing" }).click();
