@@ -66,7 +66,7 @@ jobs:
         run: |
           scp -i ~/.ssh/deploy_key \
             -P "${{ secrets.VPS_PORT }}" \
-            docker-compose.prod.yml \
+            docker-compose.prod.yaml \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${DEPLOY_PATH}/docker-compose.yaml"
 
       - name: Deploy container
