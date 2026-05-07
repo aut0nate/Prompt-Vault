@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
               type="submit"
               className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-background/70 px-5 py-3 text-sm font-medium transition hover:border-accent/60 hover:text-accent"
             >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
+              <LogOut className="h-4 w-4 -scale-x-100" aria-hidden="true" />
               Log Out
             </button>
           </form>
