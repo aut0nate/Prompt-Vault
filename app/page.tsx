@@ -36,9 +36,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <main className="mx-auto min-h-screen max-w-7xl px-4 py-10 md:px-8 md:py-12">
       <header className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
-          <p className="mb-4 inline-flex rounded-full border border-line/70 bg-panel/70 px-4 py-2 text-xs uppercase tracking-[0.26em] text-muted">
-            Personal prompt library
-          </p>
           <div className="flex items-center gap-4 md:gap-5">
             <Image
               src="/prompt-vault-logo.svg"
