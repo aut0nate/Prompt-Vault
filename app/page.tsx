@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { LogIn } from "lucide-react";
 
 import { LibraryShell } from "@/components/library-shell";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -57,16 +58,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {isAdmin ? (
             <Link
               href="/admin"
-              className="rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-medium transition hover:border-accent/60 hover:text-accent"
+              className="rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-semibold transition hover:border-accent/60 hover:text-accent"
             >
-              Open admin
+              Manage
             </Link>
           ) : (
             <Link
               href="/login"
-              className="rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-medium transition hover:border-accent/60 hover:text-accent"
+              className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-semibold transition hover:border-accent/60 hover:text-accent"
             >
-              Log in
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+              Log In
             </Link>
           )}
           <ThemeToggle />

@@ -28,9 +28,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const errorMessage =
     error === "invalid_credentials"
-      ? "The username or password is incorrect."
-      : error === "missing_password"
-        ? "Admin password is not configured. Set ADMIN_PASSWORD in your .env file."
+      ? "Those login details did not work."
+      : error === "missing_config"
+        ? "Login is not configured. Check the admin environment variables."
         : "";
 
   return (
@@ -58,10 +58,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-2xl font-bold uppercase tracking-normal text-accent">Prompt Vault</p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+            <h1 className="text-2xl font-bold uppercase tracking-normal text-accent sm:text-3xl">Prompt Vault</h1>
+            <p className="mt-2 text-lg font-bold text-foreground sm:text-xl">
               Sign in to your library
-            </h1>
+            </p>
           </div>
 
           <form action={loginAction} className="mt-8 space-y-5">
@@ -84,7 +84,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   autoComplete="username"
                   required
                   className="h-[3.75rem] w-full rounded-2xl border border-line/70 bg-background/45 py-4 pl-12 pr-4 text-base font-medium text-foreground outline-none transition placeholder:text-muted focus:border-accent/70 focus:bg-background/65 focus:ring-4 focus:ring-accent/12"
-                  placeholder="arkadmin"
                 />
               </div>
             </div>
@@ -110,7 +109,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               type="submit"
               className="h-14 w-full rounded-2xl bg-accent px-5 text-base font-semibold text-white transition hover:bg-accent/90 focus:outline-none focus:ring-4 focus:ring-accent/24"
             >
-              Log in
+              Log In
             </button>
           </form>
         </div>

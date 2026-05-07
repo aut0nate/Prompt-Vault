@@ -1,11 +1,11 @@
 export const SESSION_COOKIE_NAME = "prompt-vault-session";
 
 const encoder = new TextEncoder();
-const sessionLifetimeMs = 1000 * 60 * 60 * 24 * 7;
+const sessionLifetimeMs = 1000 * 60 * 60 * 24 * 14;
 
 type SessionPayload = {
   sub: string;
-  exp: number;
+  expiresAt: number;
 };
 
 function getSessionSecret() {
@@ -47,7 +47,7 @@ function base64UrlToBytes(value: string) {
 export async function createSessionToken(username: string) {
   const payload: SessionPayload = {
     sub: username,
-    exp: Date.now() + sessionLifetimeMs,
+    expiresAt: Date.now() + sessionLifetimeMs,
   };
 
   const encodedPayload = bytesToBase64Url(encoder.encode(JSON.stringify(payload)));
@@ -79,7 +79,7 @@ export async function verifySessionToken(token: string) {
   try {
     const payload = JSON.parse(new TextDecoder().decode(base64UrlToBytes(encodedPayload))) as SessionPayload;
 
-    if (!payload.sub || payload.exp < Date.now()) {
+    if (!payload.sub || payload.expiresAt < Date.now()) {
       return null;
     }
 

@@ -2,176 +2,211 @@
 
 ## Introduction
 
-Prompt Vault is a personal web app for saving, organising, searching, and reusing LLM prompts in one place.
+Prompt Vault is a personal web app for saving, organising, searching, and reusing LLM prompts.
 
-It is for people who want an easier way to keep useful prompts organised without leaving them scattered across notes apps, chat histories, and text files. The app stores prompts in a local SQLite database, lets you browse and search them in a clearer interface, and gives one configured admin user access to manage the library.
+It is for people who want a tidy place to keep useful prompts instead of scattering them across notes apps, chat histories, and text files. Public visitors can browse the library, while the configured admin user can manage prompts, favourites, and attachments.
 
 ![Screenshot or Preview](./images/Prompt-Vault-Home.png)
 
 ## Features
 
-- Save prompts with a title, summary, category, and full Markdown content
-- Organise prompts with tags and prompt types
-- Search and filter the library by text, category, tag, type, and favourites
-- Mark important prompts as favourites for quicker access
-- Attach supporting files such as text, JSON, CSV, PDF, or YAML documents
-- Browse prompts publicly while limiting editing to the configured admin user
+- Save prompts with titles, summaries, categories, types, tags, and Markdown content.
+- Search and filter prompts by content, category, tag, type, and favourites.
+- Mark important prompts as favourites for quicker access.
+- Attach supporting files such as text, JSON, CSV, PDF, or YAML documents.
+- Protect prompt management behind a hashed admin password and signed session cookies.
 
 ## Stack
 
-- Node.js 20+
+- Node.js 22
 - Next.js App Router
 - TypeScript
 - Tailwind CSS
 - Prisma
 - SQLite
+- `bcrypt` for admin password hashing
 - Playwright
-- Docker
+- Docker and Docker Compose
+- GitHub Container Registry
+- GitHub Actions
 
 ## Requirements
 
 Before running this project, install:
 
-- Node.js 20 or newer
+- Node.js 22
 - npm
-- Docker and Docker Compose, if you want to test or deploy the app with Docker
+- Docker and Docker Compose, for container testing or server deployment
+- OpenSSL, for generating a local session secret
 
 ## Configuration (.env)
 
-1. Create a `.env` file:
+1. Create a local `.env` file from the example file:
 
-   ```bash
-   cp .env.example .env
-   ```
+    ```bash
+    cp .env.example .env
+    ```
 
-2. Update `.env` with the required values:
+2. Update `.env` with values for your local setup:
 
-   - `DATABASE_URL`
-   - `APP_ORIGIN`
-   - `SESSION_SECRET`
-   - `ADMIN_PASSWORD`
+    ```bash
+    ADMIN_USERNAME=prompt-admin
+    ADMIN_PASSWORD_HASH=replace-with-output-from-npm-run-password-hash
+    SESSION_SECRET=replace-with-a-long-random-string
+    DATABASE_URL=file:./dev.db
+    APP_ORIGIN=http://localhost:3000
+    ```
 
-Example `.env`:
+3. Generate an admin password hash:
 
-```bash
-DATABASE_URL="file:./dev.db"
-APP_ORIGIN="http://localhost:3000"
-SESSION_SECRET="replace-with-a-long-random-string"
-ADMIN_PASSWORD="replace-with-a-strong-admin-password"
-```
+    ```bash
+    npm run password:hash -- "your-strong-password"
+    ```
+
+    The command prints an `ADMIN_PASSWORD_HASH=...` line that is escaped safely for a Next.js `.env` file. Keep the plain password in your password manager, not in the project.
+
+4. Generate a session secret:
+
+    ```bash
+    openssl rand -base64 48
+    ```
 
 Environment notes:
 
-- `DATABASE_URL` controls the SQLite database path for local development. The default `file:./dev.db` works for the local npm setup.
-- `APP_ORIGIN` should be the full public address where Prompt Vault runs. Use `http://localhost:3000` locally, and your real domain in production.
-- `SESSION_SECRET` is required for both local and Docker use. It signs login sessions, should be a long random value, and should stay stable for a given deployment.
-- Changing `SESSION_SECRET` will sign everyone out.
-- `ADMIN_PASSWORD` is the password for the built-in `arkadmin` user. Use a strong, unique value and keep it out of git.
-
-You can generate a suitable `SESSION_SECRET` with:
-
-```bash
-openssl rand -base64 32
-```
+- `ADMIN_USERNAME` is the owner username allowed to access the admin area.
+- `ADMIN_PASSWORD_HASH` is the bcrypt hash for the admin password. Escape `$` characters in `.env` as shown so Next.js does not expand them.
+- `SESSION_SECRET` signs admin session cookies. Keep it long, random, and stable for a deployment.
+- `DATABASE_URL` controls the SQLite database path. Local npm development uses `file:./dev.db`.
+- `APP_ORIGIN` is the full address where Prompt Vault runs. Use `http://localhost:3000` locally and your real HTTPS domain in production.
 
 ## Test Locally
 
 1. Install dependencies:
 
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 
-2. Prepare the application:
+2. Create and update `.env` using the configuration steps above.
 
-   ```bash
-   npm run prisma:generate
-   npm run db:push
-   npm run db:seed
-   ```
+3. Create the SQLite database and seed sample prompts:
 
-3. Start the app:
+    ```bash
+    npm run prisma:generate
+    npm run db:push
+    npm run db:seed
+    ```
 
-   ```bash
-   npm run dev
-   ```
+4. Start the app:
 
-4. Open [http://localhost:3000](http://localhost:3000).
+    ```bash
+    npm run dev
+    ```
+
+5. Open `http://127.0.0.1:3000`.
+
+6. Before handing off changes, run:
+
+    ```bash
+    npm run lint
+    npm run build
+    npm run test:e2e
+    ```
 
 ## Test Locally Using Docker
 
-Use Docker locally when you want to test the application before deploying to your server. Start by building the image:
+Docker is useful for checking the container before server deployment. The local Compose file builds the image, reads `.env`, publishes port `3000`, and mounts `./storage` to `/app/data` for the SQLite database and prompt attachments.
 
-1. Build and start the local container:
+1. Start the local Docker stack:
 
-   ```bash
-   docker compose up --build
-   ```
+    ```bash
+    docker compose up --build
+    ```
 
-2. Open [http://localhost:3000](http://localhost:3000).
+    The app will be available at `http://127.0.0.1:3000`.
 
-Notes:
+2. Stop the stack:
 
-- The local `docker-compose.yaml` file publishes port `3000` to `localhost`.
-- The SQLite database and prompt attachments are stored in the local `storage/` folder and mounted into the container at `/app/data`.
-- The main database file lives at `storage/dev.db`.
-- Prompt attachments live under `storage/prompt-attachments/`.
-- Docker uses the absolute SQLite path `/app/data/dev.db` inside the container so build-time and runtime Prisma point at the same database file.
-- The container prepares the mounted `storage/` folder on startup, then runs the application as the non-root `nextjs` user.
+    ```bash
+    docker compose down
+    ```
+
+>[!Note]
+The local Compose file is `docker-compose.yaml`. The production source Compose file is `docker-compose.prod.yaml`.
 
 ## Server Deployment
 
 You can run this on your own server by pulling the latest Docker image from `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:-latest}`.
 
-Use the structure that fits your own environment and preferred deployment methods.
-For public-facing access, put the service behind HTTPS using a reverse proxy such as Nginx Proxy Manager, Caddy, Traefik, or any other preferred method.
+Use the structure that fits your own environment and preferred deployment methods. For public-facing access, put the service behind HTTPS using a reverse proxy such as Nginx Proxy Manager, Caddy, Traefik, or another preferred option. In my environment, I am using Nginx Proxy Manager with a docker network named `edge-net`.
 
 For most Docker-based deployments:
 
 1. Create a directory in your chosen location on your server, for example `/opt/stacks/prompts`.
 2. Change into this directory.
-3. Ensure the `docker-compose.prod.yaml` file is saved in this directory.
+3. Ensure the production Compose file is saved in this directory. In this repository the production source file is `docker-compose.prod.yaml`, but the associated GitHub Actions CI/CD workflow should save it as `docker-compose.yaml`.
 4. Create a `.env` file:
 
-   ```bash
-   APP_ORIGIN="https://prompts.example.com"
-   SESSION_SECRET="replace-with-a-long-random-string"
-   ADMIN_PASSWORD="replace-with-a-strong-admin-password"
-   IMAGE_TAG=latest
-   ```
+    ```bash
+    ADMIN_USERNAME=prompt-admin
+    ADMIN_PASSWORD_HASH=replace-with-output-from-npm-run-password-hash
+    SESSION_SECRET=replace-with-a-long-random-string
+    DATABASE_URL=file:./dev.db
+    APP_ORIGIN=http://localhost:3000
+    IMAGE_TAG=latest
+    ```
 
-5. Create the persistent storage directory:
+5. Create the external Docker network or create your own and update the production Compose file accordingly.
 
-   ```bash
-   mkdir -p storage
-   ```
+    ```bash
+    docker network create edge-net
+    ```
 
-6. Create the external Docker network or use an existing one. If you use an existing network, update the `docker-compose.prod.yaml` file accordingly.
+6. Start the public image using the Compose file name on your server:
 
-   ```bash
-   docker network create edge-net
-   ```
+    ```bash
+    docker compose -f docker-compose.yaml up -d
+    ```
 
-7. Start the public image:
-
-   ```bash
-   docker compose -f docker-compose.prod.yaml up -d
-   ```
-
+7. Configure your reverse proxy to the app container on port `3000`.
 8. Verify the public URL after deployment.
 
 Example production files:
 
 - `docker-compose.prod.yaml`
+- `docker-compose.yaml`
 - `.env`
-- `storage/`
 
 After deployment, verify:
 
 - The public homepage loads.
 - `/login` loads.
-- The `arkadmin` login works with the configured `ADMIN_PASSWORD`.
-- Existing prompts and attachments are still present.
+- Admin login works.
+- Uploads remain available after restarting the container.
+- Prompt search and filters work.
+- Prompts remain available after restarting the container.
+
+Back up the SQLite database and uploaded prompts and attachments regularly from the `storage` Docker volume or from your chosen mounted storage location.
+
+## GitHub Actions
+
+- `CI - Validate and build` should run on pull requests and pushes to `main`.
+- CI should install dependencies, run linting, run type checks, build the Next.js application, build a Docker image, and smoke test the container locally.
+- `CD - Build and deploy` should run only after CI succeeds on `main`.
+- CD should build and push `ghcr.io/aut0nate/prompt-vault:latest` and `ghcr.io/aut0nate/prompt-vault:<commit-sha>`.
+- CD should upload `docker-compose.prod.yaml` to the server as `docker-compose.yaml`, update `IMAGE_TAG` in the server `.env`, then run `docker compose pull` and `docker compose up -d`.
+- Deployment SSH details should be stored in GitHub Actions secrets: `VPS_HOST`, `VPS_PORT`, `VPS_USER`, and `VPS_SSH_KEY`.
+- Production runtime values should live in the server `.env`, not in the workflow files.
+
+## Security Notes
+
+- Do not commit `.env`.
+- Keep `SESSION_SECRET` long and random.
+- Use `npm run password:hash` rather than storing a plain password.
+- The admin login uses bcrypt password hashes, timing-safe comparisons, signed HTTP-only cookies, and short in-memory throttling after repeated failed login attempts.
+- Store production secrets in the deployment environment or GitHub Actions secrets, not in the repository.
+- Use a unique admin password for production and rotate `SESSION_SECRET` if it is ever exposed. Rotating the secret signs every existing admin session out.
+- Public visitors should only see prompt content that is intended to be public.
 
 ## AI-Assisted Development
 
