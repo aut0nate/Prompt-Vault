@@ -18,6 +18,7 @@ export default defineConfig({
     env: {
       DATABASE_URL: testDatabaseUrl,
       SESSION_SECRET: "playwright-session-secret",
+      ADMIN_PASSWORD: "playwright-admin-password",
     },
   },
   projects: [

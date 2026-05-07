@@ -58,6 +58,25 @@ test("homepage supports search, modal open, copy, infinite scroll, and end messa
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(12);
 });
 
+test("admin can sign in with the configured password", async ({ page }) => {
+  await page.goto("/login");
+
+  await expect(page.getByRole("heading", { name: "Sign in to your library" })).toBeVisible();
+  await expect(page.getByText("Prompt Vault")).toBeVisible();
+
+  await page.getByLabel("Username").fill("arkadmin");
+  await page.getByLabel("Password").fill("wrong-password");
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page.getByText("The username or password is incorrect.")).toBeVisible();
+
+  await page.getByLabel("Username").fill("arkadmin");
+  await page.getByLabel("Password").fill("playwright-admin-password");
+  await page.getByRole("button", { name: "Log in" }).click();
+
+  await expect(page).toHaveURL("/admin");
+  await expect(page.getByRole("heading", { name: "Manage your prompt library" })).toBeVisible();
+});
+
 test("admin can create, edit, favourite, and delete a prompt", async ({ page }) => {
   page.on("dialog", (dialog) => dialog.accept());
   const txtAttachmentPath = path.join(process.cwd(), "tests", "fixtures", "prompt-context.txt");
