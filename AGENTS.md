@@ -58,7 +58,7 @@ Use these commands from the repository root:
 
 1. Install dependencies.
 2. Create `.env` from `.env.example`.
-3. Set `DATABASE_URL`, `APP_ORIGIN`, `SESSION_SECRET`, and the GitHub OAuth values.
+3. Set `DATABASE_URL`, `APP_ORIGIN`, `SESSION_SECRET`, and `ADMIN_PASSWORD`.
 4. Run Prisma generate and database setup.
 5. Start the app with `npm run dev`.
 

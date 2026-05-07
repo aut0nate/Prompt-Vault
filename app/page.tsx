@@ -66,7 +66,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               href="/login"
               className="rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-medium transition hover:border-accent/60 hover:text-accent"
             >
-              Login
+              Log in
             </Link>
           )}
           <ThemeToggle />

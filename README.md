@@ -4,7 +4,7 @@
 
 Prompt Vault is a personal web app for saving, organising, searching, and reusing LLM prompts in one place.
 
-It is for people who want an easier way to keep useful prompts organised without leaving them scattered across notes apps, chat histories, and text files. The app stores prompts in a local SQLite database, lets you browse and search them in a clearer interface, and gives one allowed GitHub account access to manage the library.
+It is for people who want an easier way to keep useful prompts organised without leaving them scattered across notes apps, chat histories, and text files. The app stores prompts in a local SQLite database, lets you browse and search them in a clearer interface, and gives one configured admin user access to manage the library.
 
 ![Screenshot or Preview](./images/Prompt-Vault-Home.png)
 
@@ -15,7 +15,7 @@ It is for people who want an easier way to keep useful prompts organised without
 - Search and filter the library by text, category, tag, type, and favourites
 - Mark important prompts as favourites for quicker access
 - Attach supporting files such as text, JSON, CSV, PDF, or YAML documents
-- Browse prompts publicly while limiting editing to one allowed GitHub account
+- Browse prompts publicly while limiting editing to the configured admin user
 
 ## Stack
 
@@ -44,20 +44,12 @@ Before running this project, install:
    cp .env.example .env
    ```
 
-2. Create a [GitHub OAuth app](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) and use this callback URL:
-
-   ```text
-   http://localhost:3000/api/auth/github/callback
-   ```
-
-3. Update `.env` with the required values:
+2. Update `.env` with the required values:
 
    - `DATABASE_URL`
    - `APP_ORIGIN`
    - `SESSION_SECRET`
-   - `GITHUB_CLIENT_ID`
-   - `GITHUB_CLIENT_SECRET`
-   - `GITHUB_ALLOWED_USERNAME`
+   - `ADMIN_PASSWORD`
 
 Example `.env`:
 
@@ -65,9 +57,7 @@ Example `.env`:
 DATABASE_URL="file:./dev.db"
 APP_ORIGIN="http://localhost:3000"
 SESSION_SECRET="replace-with-a-long-random-string"
-GITHUB_CLIENT_ID="replace-with-your-github-oauth-app-client-id"
-GITHUB_CLIENT_SECRET="replace-with-your-github-oauth-app-client-secret"
-GITHUB_ALLOWED_USERNAME="your-github-username"
+ADMIN_PASSWORD="replace-with-a-strong-admin-password"
 ```
 
 Environment notes:
@@ -76,8 +66,7 @@ Environment notes:
 - `APP_ORIGIN` should be the full public address where Prompt Vault runs. Use `http://localhost:3000` locally, and your real domain in production.
 - `SESSION_SECRET` is required for both local and Docker use. It signs login sessions, should be a long random value, and should stay stable for a given deployment.
 - Changing `SESSION_SECRET` will sign everyone out.
-- `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` come from your GitHub OAuth app.
-- `GITHUB_ALLOWED_USERNAME` is the only GitHub username allowed to sign in and manage prompts.
+- `ADMIN_PASSWORD` is the password for the built-in `arkadmin` user. Use a strong, unique value and keep it out of git.
 
 You can generate a suitable `SESSION_SECRET` with:
 
@@ -147,9 +136,7 @@ For most Docker-based deployments:
    ```bash
    APP_ORIGIN="https://prompts.example.com"
    SESSION_SECRET="replace-with-a-long-random-string"
-   GITHUB_CLIENT_ID="replace-with-your-github-oauth-app-client-id"
-   GITHUB_CLIENT_SECRET="replace-with-your-github-oauth-app-client-secret"
-   GITHUB_ALLOWED_USERNAME="your-github-username"
+   ADMIN_PASSWORD="replace-with-a-strong-admin-password"
    IMAGE_TAG=latest
    ```
 
@@ -183,7 +170,7 @@ After deployment, verify:
 
 - The public homepage loads.
 - `/login` loads.
-- GitHub login works with the production callback URL.
+- The `arkadmin` login works with the configured `ADMIN_PASSWORD`.
 - Existing prompts and attachments are still present.
 
 ## AI-Assisted Development
