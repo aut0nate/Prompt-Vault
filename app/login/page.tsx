@@ -73,12 +73,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <Link
               href={`/auth/login?next=${encodeURIComponent(nextPath)}`}
               prefetch={false}
-              className="h-14 w-full rounded-2xl bg-accent px-5 text-base font-semibold text-white transition hover:bg-accent/90 focus:outline-none focus:ring-4 focus:ring-accent/24"
+              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-base font-semibold text-white shadow-[0_14px_34px_rgb(220_38_38/0.24)] transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500/30"
             >
-              <span className="flex h-full items-center justify-center gap-2">
-                <LogIn className="h-5 w-5" aria-hidden="true" />
-                Sign in with Authentik
-              </span>
+              <LogIn className="h-5 w-5" aria-hidden="true" />
+              Sign in with Authentik
             </Link>
           </div>
         </div>

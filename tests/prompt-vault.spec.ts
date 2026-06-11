@@ -63,10 +63,13 @@ test("admin sign-in redirects to Authentik", async ({ page }) => {
 
   await expect(page.getByText("Sign in to your library")).toBeVisible();
   await expect(page.getByText("Prompt Vault")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Sign in with Authentik" })).toHaveAttribute(
+  const signInLink = page.getByRole("link", { name: "Sign in with Authentik" });
+  await expect(signInLink).toHaveAttribute(
     "href",
     "/auth/login?next=%2Fadmin",
   );
+  await expect(signInLink).toHaveCSS("display", "inline-flex");
+  await expect(signInLink).toHaveCSS("background-color", "rgb(220, 38, 38)");
 });
 
 test("admin routes require sign-in", async ({ page }) => {
