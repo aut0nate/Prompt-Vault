@@ -52,6 +52,16 @@ function trimTrailingSlash(value: string) {
   return value.endsWith("/") ? value.slice(0, -1) : value;
 }
 
+function getRequestOrigin(request: NextRequest) {
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost || request.headers.get("host") || request.nextUrl.host;
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol = forwardedProto || request.nextUrl.protocol.replace(":", "") || "http";
+  const browserHost = host.replace(/^0\.0\.0\.0(?=[:/]|$)/, "localhost");
+
+  return `${protocol}://${browserHost}`;
+}
+
 function getRequiredEnv(name: string) {
   const value = process.env[name]?.trim();
 
@@ -83,7 +93,7 @@ export function getAppUrl(request: NextRequest) {
     return trimTrailingSlash(configuredAppUrl);
   }
 
-  return request.nextUrl.origin;
+  return getRequestOrigin(request);
 }
 
 export function safeNextPath(value: string | null) {
