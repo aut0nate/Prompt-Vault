@@ -31,16 +31,14 @@ jobs:
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build image
-        run: docker build --build-arg DATABASE_URL=file:/app/data/dev.db -t "${IMAGE_NAME}:latest" .
-
-      - name: Tag with commit SHA
-        run: docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${{ github.event.workflow_run.head_sha }}"
-
-      - name: Push images
+      - name: Build and push image
         run: |
-          docker push "${IMAGE_NAME}:latest"
-          docker push "${IMAGE_NAME}:${{ github.event.workflow_run.head_sha }}"
+          docker buildx build \
+            --build-arg DATABASE_URL=file:/app/data/dev.db \
+            --tag "${IMAGE_NAME}:latest" \
+            --tag "${IMAGE_NAME}:${{ github.event.workflow_run.head_sha }}" \
+            --push \
+            .
 
   deploy:
     name: Deploy to production server
