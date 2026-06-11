@@ -3,7 +3,7 @@ function trimTrailingSlash(value: string) {
 }
 
 export function getAppOrigin(request: Request) {
-  const configuredOrigin = process.env.APP_ORIGIN?.trim();
+  const configuredOrigin = process.env.APP_URL?.trim() || process.env.APP_ORIGIN?.trim();
 
   if (configuredOrigin) {
     return trimTrailingSlash(configuredOrigin);

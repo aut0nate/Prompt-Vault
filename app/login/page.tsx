@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, LockKeyhole, User } from "lucide-react";
+import { ArrowLeft, LogIn } from "lucide-react";
 
 import { getSession } from "@/lib/auth";
-import { loginAction } from "./actions";
 
 type LoginPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -27,10 +26,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const error = typeof resolvedSearchParams.error === "string" ? resolvedSearchParams.error : "";
 
   const errorMessage =
-    error === "invalid_credentials"
-      ? "Those login details did not work."
+    error === "invalid_state"
+      ? "That sign-in request expired. Please try again."
       : error === "missing_config"
-        ? "Login is not configured. Check the admin environment variables."
+        ? "Sign-in is not configured. Check the Authentik environment variables."
+        : error === "auth_failed"
+          ? "Authentik sign-in could not be completed."
         : "";
 
   return (
@@ -64,54 +65,22 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </p>
           </div>
 
-          <form action={loginAction} className="mt-8 space-y-5">
-            <input type="hidden" name="next" value={nextPath} />
-
+          <div className="mt-8 space-y-5">
             {errorMessage ? (
               <p className="status-error rounded-2xl px-4 py-3 text-sm font-medium">{errorMessage}</p>
             ) : null}
 
-            <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-bold text-foreground">
-                Username
-              </label>
-              <div className="relative">
-                <User className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  className="h-[3.75rem] w-full rounded-2xl border border-line/70 bg-background/45 py-4 pl-12 pr-4 text-base font-medium text-foreground outline-none transition placeholder:text-muted focus:border-accent/70 focus:bg-background/65 focus:ring-4 focus:ring-accent/12"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-bold text-foreground">
-                Password
-              </label>
-              <div className="relative">
-                <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="h-[3.75rem] w-full rounded-2xl border border-line/70 bg-background/45 py-4 pl-12 pr-4 text-base font-medium text-foreground outline-none transition focus:border-accent/70 focus:bg-background/65 focus:ring-4 focus:ring-accent/12"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
+            <Link
+              href={`/auth/login?next=${encodeURIComponent(nextPath)}`}
+              prefetch={false}
               className="h-14 w-full rounded-2xl bg-accent px-5 text-base font-semibold text-white transition hover:bg-accent/90 focus:outline-none focus:ring-4 focus:ring-accent/24"
             >
-              Log In
-            </button>
-          </form>
+              <span className="flex h-full items-center justify-center gap-2">
+                <LogIn className="h-5 w-5" aria-hidden="true" />
+                Sign in with Authentik
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
     </main>

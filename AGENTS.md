@@ -46,7 +46,6 @@ Use these commands from the repository root:
 - `npm run build` - Generate Prisma client and build the production app.
 - `npm run start` - Run the built production app.
 - `npm run lint` - Run linting.
-- `npm run password:hash -- "your-strong-password"` - Generate an escaped bcrypt hash for `ADMIN_PASSWORD_HASH`.
 - `npm run prisma:generate` - Regenerate the Prisma client.
 - `npm run db:push` - Push the Prisma schema to the local database.
 - `npm run db:seed` - Seed the local database.
@@ -59,18 +58,18 @@ Use these commands from the repository root:
 
 1. Install dependencies.
 2. Create `.env` from `.env.example`.
-3. Set `DATABASE_URL`, `APP_ORIGIN`, `SESSION_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD_HASH`.
+3. Set `DATABASE_URL`, `APP_URL`, `SESSION_SECRET`, `AUTHENTIK_ISSUER`, `AUTHENTIK_CLIENT_ID`, `AUTHENTIK_CLIENT_SECRET`, and `AUTHENTIK_ADMIN_EMAIL`.
 4. Run Prisma generate and database setup.
 5. Start the app with `npm run dev`.
 
-The admin login lives at `/login` and the admin dashboard lives at `/admin`.
+The admin sign-in page lives at `/login`, the Authentik callback lives at `/auth/callback`, and the admin dashboard lives at `/admin`.
 
 ## Testing Guidance
 
 - Prefer local verification before Docker changes.
 - Run `npm run lint` after code changes that affect application logic or UI.
 - Run `npm run test:e2e` when changing user flows, authentication, prompt management, search, or modal behaviour.
-- The Playwright tests expect a seeded database and a working admin login.
+- The Playwright tests expect a seeded database and a working admin session.
 - CI must pass linting, production build, Playwright tests, Docker image build, and the Docker smoke test before a change is considered deployable.
 
 ## Database Notes
@@ -83,10 +82,10 @@ The admin login lives at `/login` and the admin dashboard lives at `/admin`.
 ## Security Notes
 
 - Treat `.env` as local-only.
-- Never commit secrets, password hashes, or private credentials.
+- Never commit secrets, client secrets, or private credentials.
 - Store SSH deployment credentials as GitHub repository secrets named `VPS_HOST`, `VPS_PORT`, `VPS_USER`, and `VPS_SSH_KEY`.
 - Use the built-in `GITHUB_TOKEN` for GHCR publishing; do not add personal access tokens unless the built-in token is insufficient.
-- Review auth-related changes carefully, especially middleware, login actions, and admin routes.
+- Review auth-related changes carefully, especially middleware, Authentik routes, session cookies, and admin routes.
 - Be careful when modifying API routes that expose prompt content or allow write operations.
 
 ## Docker Notes
