@@ -58,23 +58,22 @@ test("homepage supports search, modal open, copy, infinite scroll, and end messa
   await expect(page.locator("[data-testid='prompt-card']")).toHaveCount(12);
 });
 
-test("admin can sign in with the configured password", async ({ page }) => {
+test("admin sign-in redirects to Authentik", async ({ page }) => {
   await page.goto("/login");
 
   await expect(page.getByText("Sign in to your library")).toBeVisible();
   await expect(page.getByText("Prompt Vault")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in with Authentik" })).toHaveAttribute(
+    "href",
+    "/auth/login?next=%2Fadmin",
+  );
+});
 
-  await page.getByLabel("Username").fill("playwright-admin");
-  await page.getByLabel("Password").fill("wrong-password");
-  await page.getByRole("button", { name: "Log In" }).click();
-  await expect(page.getByText("Those login details did not work.")).toBeVisible();
+test("admin routes require sign-in", async ({ page }) => {
+  await page.goto("/admin");
 
-  await page.getByLabel("Username").fill("playwright-admin");
-  await page.getByLabel("Password").fill("playwright-admin-password");
-  await page.getByRole("button", { name: "Log In" }).click();
-
-  await expect(page).toHaveURL("/admin");
-  await expect(page.getByRole("heading", { name: "Manage Prompts" })).toBeVisible();
+  await expect(page).toHaveURL("/login?next=%2Fadmin");
+  await expect(page.getByRole("link", { name: "Sign in with Authentik" })).toBeVisible();
 });
 
 test("admin can create, edit, favourite, and delete a prompt", async ({ page }) => {
@@ -89,7 +88,7 @@ test("admin can create, edit, favourite, and delete a prompt", async ({ page }) 
       domain: "127.0.0.1",
       path: "/",
       httpOnly: true,
-      sameSite: "Strict",
+      sameSite: "Lax",
     },
   ]);
 

@@ -8,7 +8,6 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "password:hash": "node scripts/hash-password.mjs",
     "prisma:generate": "prisma generate",
     "db:push": "node scripts/db-push.mjs",
     "db:seed": "node prisma/seed.mjs",
@@ -23,7 +22,6 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^6.19.0",
-    "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -39,7 +37,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@types/bcrypt": "^6.0.0",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

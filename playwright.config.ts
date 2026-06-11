@@ -1,5 +1,4 @@
 import path from "node:path";
-import bcrypt from "bcrypt";
 import { defineConfig, devices } from "@playwright/test";
 
 const testDatabaseUrl = `file:${path.resolve("prisma/playwright.db")}`;
@@ -18,9 +17,12 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     env: {
       DATABASE_URL: testDatabaseUrl,
+      APP_URL: "http://127.0.0.1:3000",
       SESSION_SECRET: "playwright-session-secret",
-      ADMIN_USERNAME: "playwright-admin",
-      ADMIN_PASSWORD_HASH: bcrypt.hashSync("playwright-admin-password", 12).replaceAll("$", "\\$"),
+      AUTHENTIK_ISSUER: "https://auth.example.com/application/o/prompt-vault/",
+      AUTHENTIK_CLIENT_ID: "playwright-client-id",
+      AUTHENTIK_CLIENT_SECRET: "playwright-client-secret",
+      AUTHENTIK_ADMIN_EMAIL: "playwright-admin@example.com",
     },
   },
   projects: [

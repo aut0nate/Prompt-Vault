@@ -14,7 +14,7 @@ It is for people who want a tidy place to keep useful prompts instead of scatter
 - Search and filter prompts by content, category, tag, type, and favourites.
 - Mark important prompts as favourites for quicker access.
 - Attach supporting files such as text, JSON, CSV, PDF, or YAML documents.
-- Protect prompt management behind a hashed admin password and signed session cookies.
+- Protect prompt management behind Authentik OpenID Connect and signed session cookies.
 
 ## Stack
 
@@ -24,7 +24,6 @@ It is for people who want a tidy place to keep useful prompts instead of scatter
 - Tailwind CSS
 - Prisma
 - SQLite
-- `bcrypt` for admin password hashing
 - Playwright
 - Docker and Docker Compose
 - GitHub Container Registry
@@ -38,6 +37,7 @@ Before running this project, install:
 - npm
 - Docker and Docker Compose, for container testing or server deployment
 - OpenSSL, for generating a local session secret
+- An Authentik OAuth2/OpenID Provider for admin sign-in
 
 ## Configuration (.env)
 
@@ -50,22 +50,16 @@ Before running this project, install:
 2. Update `.env` with values for your local setup:
 
     ```bash
-    ADMIN_USERNAME=prompt-admin
-    ADMIN_PASSWORD_HASH=replace-with-output-from-npm-run-password-hash
-    SESSION_SECRET=replace-with-a-long-random-string
     DATABASE_URL=file:./dev.db
-    APP_ORIGIN=http://localhost:3000
+    APP_URL=http://localhost:3000
+    SESSION_SECRET=replace-with-a-long-random-string
+    AUTHENTIK_ISSUER=https://auth.example.com/application/o/prompt-vault/
+    AUTHENTIK_CLIENT_ID=replace-with-authentik-client-id
+    AUTHENTIK_CLIENT_SECRET=replace-with-authentik-client-secret
+    AUTHENTIK_ADMIN_EMAIL=you@example.com
     ```
 
-3. Generate an admin password hash:
-
-    ```bash
-    npm run password:hash -- "your-strong-password"
-    ```
-
-    The command prints an `ADMIN_PASSWORD_HASH=...` line that is escaped safely for a Next.js `.env` file. Keep the plain password in your password manager, not in the project.
-
-4. Generate a session secret:
+3. Generate a session secret:
 
     ```bash
     openssl rand -base64 48
@@ -73,11 +67,27 @@ Before running this project, install:
 
 Environment notes:
 
-- `ADMIN_USERNAME` is the owner username allowed to access the admin area.
-- `ADMIN_PASSWORD_HASH` is the bcrypt hash for the admin password. Escape `$` characters in `.env` as shown so Next.js does not expand them.
 - `SESSION_SECRET` signs admin session cookies. Keep it long, random, and stable for a deployment.
 - `DATABASE_URL` controls the SQLite database path. Local npm development uses `file:./dev.db`.
-- `APP_ORIGIN` is the full address where Prompt Vault runs. Use `http://localhost:3000` locally and your real HTTPS domain in production.
+- `APP_URL` is the full public address where Prompt Vault runs. Use `http://localhost:3000` locally and your real HTTPS domain in production.
+- `AUTHENTIK_ISSUER` is the Authentik issuer URL, usually `https://auth.example.com/application/o/<slug>/`.
+- `AUTHENTIK_CLIENT_ID` and `AUTHENTIK_CLIENT_SECRET` come from the Authentik provider.
+- `AUTHENTIK_ADMIN_EMAIL` must exactly match the Authentik user email allowed to manage Prompt Vault.
+- `AUTHENTIK_REDIRECT_URI` is optional. Set it only if the callback differs from `APP_URL + /auth/callback`.
+
+## Authentik Setup
+
+Create an OAuth2/OpenID Provider in Authentik:
+
+- Provider type: OAuth2/OpenID Provider.
+- Client type: Confidential.
+- Redirect URI: `<APP_URL>/auth/callback`, for example `https://prompts.example.com/auth/callback`.
+- Signing key: RSA/RS256.
+- Scopes: `openid`, `profile`, and `email`.
+
+Create an Authentik Application attached to that provider. Use a stable lowercase slug such as `prompt-vault`, and make sure the issuer path in `.env` matches that slug, for example `https://auth.example.com/application/o/prompt-vault/`.
+
+The Authentik user email must match `AUTHENTIK_ADMIN_EMAIL`. Prompt Vault keeps its own HTTP-only session cookie after Authentik succeeds, and logout clears only that local app session.
 
 ## Test Locally
 
@@ -148,11 +158,13 @@ For most Docker-based deployments:
 4. Create a `.env` file:
 
     ```bash
-    ADMIN_USERNAME=prompt-admin
-    ADMIN_PASSWORD_HASH=replace-with-output-from-npm-run-password-hash
-    SESSION_SECRET=replace-with-a-long-random-string
     DATABASE_URL=file:./dev.db
-    APP_ORIGIN=http://localhost:3000
+    APP_URL=https://prompts.example.com
+    SESSION_SECRET=replace-with-a-long-random-string
+    AUTHENTIK_ISSUER=https://auth.example.com/application/o/prompt-vault/
+    AUTHENTIK_CLIENT_ID=replace-with-authentik-client-id
+    AUTHENTIK_CLIENT_SECRET=replace-with-authentik-client-secret
+    AUTHENTIK_ADMIN_EMAIL=you@example.com
     IMAGE_TAG=latest
     ```
 
@@ -181,7 +193,7 @@ After deployment, verify:
 
 - The public homepage loads.
 - `/login` loads.
-- Admin login works.
+- Authentik sign-in redirects back to `/admin`.
 - Uploads remain available after restarting the container.
 - Prompt search and filters work.
 - Prompts remain available after restarting the container.
@@ -202,10 +214,10 @@ Back up the SQLite database and uploaded prompts and attachments regularly from 
 
 - Do not commit `.env`.
 - Keep `SESSION_SECRET` long and random.
-- Use `npm run password:hash` rather than storing a plain password.
-- The admin login uses bcrypt password hashes, timing-safe comparisons, signed HTTP-only cookies, and short in-memory throttling after repeated failed login attempts.
+- Use Authentik for identity proofing; do not add local passwords or hardcoded owner secrets.
+- The admin sign-in flow uses Authorization Code with PKCE, Authentik RS256 ID token verification, an owner email allow-list, and signed HTTP-only cookies.
 - Store production secrets in the deployment environment or GitHub Actions secrets, not in the repository.
-- Use a unique admin password for production and rotate `SESSION_SECRET` if it is ever exposed. Rotating the secret signs every existing admin session out.
+- Rotate `SESSION_SECRET` if it is ever exposed. Rotating the secret signs every existing admin session out.
 - Public visitors should only see prompt content that is intended to be public.
 
 ## AI-Assisted Development
