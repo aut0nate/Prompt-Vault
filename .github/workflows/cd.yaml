@@ -13,7 +13,7 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/aut0nate/prompt-vault
-  DEPLOY_PATH: /opt/stacks/prompts
+  DEPLOY_PATH: /opt/stacks/prompt-vault
 
 jobs:
   build-and-push:

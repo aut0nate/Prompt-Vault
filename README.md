@@ -146,13 +146,13 @@ The local Compose file is `docker-compose.yaml`. The production source Compose f
 
 ## Server Deployment
 
-You can run this on your own server by pulling a published Docker image from `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:-latest}`.
+You can run this on your own server by pulling a published Docker image from `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG}`. The GitHub Actions CD workflow updates `IMAGE_TAG` to the merged commit SHA before deployment.
 
 Use the structure that fits your own environment and preferred deployment methods. For public-facing access, put the service behind HTTPS using a reverse proxy such as Nginx Proxy Manager, Caddy, Traefik, or another preferred option. In my environment, I am using Nginx Proxy Manager with a docker network named `edge-net`.
 
 For most Docker-based deployments:
 
-1. Create a directory in your chosen location on your server, for example `/opt/stacks/prompts`.
+1. Create a directory in your chosen location on your server, for example `/opt/stacks/prompt-vault`.
 2. Change into this directory.
 3. Ensure the production Compose file is saved in this directory. In this repository the production source file is `docker-compose.prod.yaml`, but the associated GitHub Actions CI/CD workflow should save it as `docker-compose.yaml`.
 4. Create a `.env` file:

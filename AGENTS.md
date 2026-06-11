@@ -93,7 +93,7 @@ The admin sign-in page lives at `/login`, the Authentik callback lives at `/auth
 - The project is already containerised.
 - `Dockerfile` builds the app for production.
 - `docker-compose.yaml` builds locally, maps `localhost:3000` to the app, and mounts `./storage` to `/app/data`.
-- `docker-compose.prod.yaml` pulls `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:-latest}` and mounts `./storage` to `/app/data`.
+- `docker-compose.prod.yaml` pulls `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG}` and mounts `./storage` to `/app/data`; `IMAGE_TAG` is required and should be a published commit SHA.
 - Published deployment images are tagged as `ghcr.io/aut0nate/prompt-vault:<git-sha>`.
 - Keep SQLite data and prompt attachments outside the image in the persistent `storage/` mount.
 - The production server should only need `docker-compose.yaml`, `.env`, and `storage/`; do not build from source on the production server.
