@@ -1,17 +1,44 @@
 services:
   prompt-vault:
     container_name: prompt-vault
-    image: ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:-latest}
+    image: ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:?Set IMAGE_TAG to a published commit SHA}
     restart: unless-stopped
     env_file:
       - .env
     environment:
       DATABASE_URL: file:/app/data/dev.db
       ATTACHMENTS_DIR: /app/data/prompt-attachments
-    volumes:
-      - ./storage:/app/data
     networks:
       - edge-net
+    expose:
+      - "3000"
+    labels:
+      kuma.prompt-vault-docker.docker.name: Prompt Vault
+      kuma.prompt-vault-docker.docker.docker_container: prompt-vault
+      kuma.prompt-vault-docker.docker.docker_host_name: docker-vps
+      kuma.prompt-vault-docker.docker.interval: "60"
+      kuma.prompt-vault-docker.docker.retry_interval: "60"
+      kuma.prompt-vault-docker.docker.max_retries: "0"
+      kuma.prompt-vault-docker.docker.tag_names: '[{"name":"docker"}]'
+      kuma.prompt-vault-site.http.name: Prompt Vault
+      kuma.prompt-vault-site.http.url: https://prompts.autonate.dev/
+      kuma.prompt-vault-site.http.interval: "60"
+      kuma.prompt-vault-site.http.retry_interval: "60"
+      kuma.prompt-vault-site.http.max_retries: "0"
+      kuma.prompt-vault-site.http.tag_names: '[{"name":"website"}]'
+    volumes:
+      - ./storage:/app/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status < 500 ? 0 : 1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
     logging:
       options:
         max-size: "10m"
