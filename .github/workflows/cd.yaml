@@ -94,6 +94,9 @@ jobs:
           fi
 
           docker compose pull prompt-vault
+          if docker ps -a --format '{{.Names}}' | grep -qx 'prompt-vault'; then
+            docker rm -f prompt-vault
+          fi
           docker compose up -d
           docker image prune -f
 
