@@ -146,7 +146,7 @@ The local Compose file is `docker-compose.yaml`. The production source Compose f
 
 ## Server Deployment
 
-You can run this on your own server by pulling the latest Docker image from `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:-latest}`.
+You can run this on your own server by pulling a published Docker image from `ghcr.io/aut0nate/prompt-vault:${IMAGE_TAG:-latest}`.
 
 Use the structure that fits your own environment and preferred deployment methods. For public-facing access, put the service behind HTTPS using a reverse proxy such as Nginx Proxy Manager, Caddy, Traefik, or another preferred option. In my environment, I am using Nginx Proxy Manager with a docker network named `edge-net`.
 
@@ -165,7 +165,7 @@ For most Docker-based deployments:
     AUTHENTIK_CLIENT_ID=replace-with-authentik-client-id
     AUTHENTIK_CLIENT_SECRET=replace-with-authentik-client-secret
     AUTHENTIK_ADMIN_EMAIL=you@example.com
-    IMAGE_TAG=latest
+    IMAGE_TAG=replace-with-published-git-sha
     ```
 
 5. Create the external Docker network or create your own and update the production Compose file accordingly.
@@ -205,7 +205,7 @@ Back up the SQLite database and uploaded prompts and attachments regularly from 
 - `CI - Validate and build` should run on pull requests and pushes to `main`.
 - CI should install dependencies, run linting, run type checks, build the Next.js application, build a Docker image, and smoke test the container locally.
 - `CD - Build and deploy` should run only after CI succeeds on `main`.
-- CD should build and push `ghcr.io/aut0nate/prompt-vault:latest` and `ghcr.io/aut0nate/prompt-vault:<commit-sha>`.
+- CD should build and push the immutable deployment image `ghcr.io/aut0nate/prompt-vault:<commit-sha>`.
 - CD should upload `docker-compose.prod.yaml` to the server as `docker-compose.yaml`, update `IMAGE_TAG` in the server `.env`, then run `docker compose pull` and `docker compose up -d`.
 - Deployment SSH details should be stored in GitHub Actions secrets: `VPS_HOST`, `VPS_PORT`, `VPS_USER`, and `VPS_SSH_KEY`.
 - Production runtime values should live in the server `.env`, not in the workflow files.
