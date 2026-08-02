@@ -90,19 +90,19 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-2 sm:items-center sm:p-5">
       <button
         type="button"
         aria-label="Close prompt"
         onClick={onClose}
-        className="absolute inset-0 bg-background/60 backdrop-blur-xl"
+        className="absolute inset-0 bg-[#172019]/70 backdrop-blur-md"
       />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] border border-line/80 bg-background/95 shadow-[0_25px_90px_rgba(0,0,0,0.3)]">
+      <div className="relative z-10 flex max-h-[94vh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.5rem] border border-line/60 bg-background shadow-[0_32px_100px_rgba(0,0,0,0.35)] sm:max-h-[90vh]">
         <div data-testid="prompt-modal" className="hidden" />
-        <div className="flex items-start justify-between gap-6 border-b border-line/70 px-6 py-6 md:px-8">
-          <div className="space-y-5">
-            <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-muted">
+        <div className="flex items-start justify-between gap-6 border-b border-line/55 bg-panel/65 px-5 py-6 md:px-9 md:py-8">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
               <span>{prompt ? prompt.category : "Loading prompt"}</span>
               {prompt?.isFavourite ? (
                 <span className="inline-flex items-center gap-1 text-[rgb(var(--accent))]">
@@ -112,16 +112,16 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
               ) : null}
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl font-semibold leading-tight md:text-4xl">
+              <h2 className="font-display max-w-3xl text-3xl font-semibold leading-[1.05] tracking-[-0.035em] md:text-5xl">
                 {prompt?.title ?? "Loading prompt..."}
               </h2>
-              {prompt ? <p className="max-w-3xl text-base leading-8 text-foreground/72">{prompt.summary}</p> : null}
+              {prompt ? <p className="max-w-3xl text-sm leading-7 text-foreground/65 md:text-base">{prompt.summary}</p> : null}
             </div>
 
             {prompt ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted">
-                  <span className="rounded-full border border-line/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-foreground/72">
+                  <span className="rounded-lg bg-background px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/72">
                     {formatPromptType(prompt.type)}
                   </span>
                   <span className="inline-flex items-center gap-2">
@@ -135,7 +135,7 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
                     <Link
                       key={tag}
                       href={`/tags/${slugify(tag)}`}
-                      className="rounded-full border border-line/70 px-3 py-1 text-xs font-medium text-foreground/72 transition hover:border-accent hover:bg-accent hover:text-white"
+                      className="rounded-md bg-background px-2.5 py-1 text-xs font-semibold text-foreground/65 transition hover:bg-accent hover:text-white"
                     >
                       {tag}
                     </Link>
@@ -148,14 +148,14 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-line/70 p-3 text-muted transition hover:border-accent/60 hover:text-accent"
+            className="rounded-xl border border-line/60 bg-background p-2.5 text-muted transition hover:border-foreground/30 hover:text-foreground"
             aria-label="Close prompt"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="overflow-y-auto px-6 py-6 md:px-8">
+        <div className="overflow-y-auto px-5 py-5 md:px-9 md:py-7">
           {status === "loading" ? (
             <div className="flex min-h-[18rem] items-center justify-center text-muted">
               <LoaderCircle className="mr-3 h-5 w-5 animate-spin" />
@@ -170,27 +170,30 @@ export function PromptModal({ slug, onClose }: PromptModalProps) {
           ) : null}
 
           {prompt ? (
-            <div className="space-y-6">
-              <div className="flex flex-wrap items-center justify-end gap-3">
+            <div className="space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Prompt content</p>
+                <div className="flex flex-wrap items-center justify-end gap-3">
                 {prompt.attachments.length > 1 ? (
                   <button
                     type="button"
                     onClick={downloadAllFiles}
-                    className="inline-flex items-center gap-2 rounded-full border border-line/70 px-4 py-2 text-sm font-medium text-foreground/76 transition hover:border-accent/60 hover:text-accent"
+                    className="inline-flex items-center gap-2 rounded-xl border border-line/70 px-4 py-2 text-sm font-semibold text-foreground/76 transition hover:border-accent/60 hover:text-accent"
                   >
                     <Download className="h-4 w-4" />
                     Download all files
                   </button>
                 ) : null}
                 <CopyButton text={prompt.contentMarkdown} />
+                </div>
               </div>
 
-              <article className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
+              <article className="rounded-[1.25rem] border border-line/55 bg-panel/75 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] md:p-8">
                 <PromptContentRenderer content={prompt.contentMarkdown} />
               </article>
 
               {prompt.attachments.length ? (
-                <section className="rounded-[1.75rem] border border-line/70 bg-panel/70 p-6">
+                <section className="rounded-[1.25rem] border border-line/55 bg-panel/70 p-5 md:p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <Paperclip className="h-4 w-4 text-accent" />
                     <h3 className="text-lg font-semibold">Attachments</h3>

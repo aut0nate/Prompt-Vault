@@ -25,7 +25,8 @@ const config: Config = {
         "4xl": "2rem",
       },
       fontFamily: {
-        sans: ["Avenir Next", "Segoe UI", "Helvetica Neue", "sans-serif"],
+        sans: ["Avenir Next", "Avenir", "Segoe UI", "sans-serif"],
+        display: ["Iowan Old Style", "Baskerville", "Times New Roman", "serif"],
         mono: ["SFMono-Regular", "JetBrains Mono", "Menlo", "monospace"],
       },
       backgroundImage: {

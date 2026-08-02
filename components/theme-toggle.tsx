@@ -14,7 +14,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="flex h-11 w-11 items-center justify-center rounded-full border border-line/70 bg-panel/70" />
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-line/70 bg-panel/70" />
     );
   }
 
@@ -24,10 +24,10 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-line/70 bg-panel/80 text-foreground transition hover:border-accent/60 hover:text-accent"
+      className="flex h-10 w-10 items-center justify-center rounded-xl border border-line/70 bg-background/70 text-foreground transition hover:border-foreground/40 hover:text-accent"
       aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
     >
-      {isDark ? <SunMedium className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {isDark ? <SunMedium className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
   );
 }
