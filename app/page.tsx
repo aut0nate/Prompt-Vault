@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { LogIn } from "lucide-react";
+import { ArrowUpRight, LogIn, Plus } from "lucide-react";
 
 import { LibraryShell } from "@/components/library-shell";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -34,41 +34,42 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-4 py-10 md:px-8 md:py-12">
-      <header className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-4 md:gap-5">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 pb-16 pt-4 md:px-7 md:pt-6">
+      <header className="mb-6 flex items-center justify-between rounded-[1.4rem] border border-line/60 bg-panel/70 px-4 py-3 shadow-sm backdrop-blur-xl md:px-5">
+        <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/prompt-vault-logo.svg"
               alt=""
               aria-hidden="true"
               width={80}
               height={80}
-              className="h-16 w-16 shrink-0 md:h-20 md:w-20"
+              className="h-10 w-10 shrink-0 md:h-11 md:w-11"
             />
-            <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">Prompt Vault</h1>
+          <div className="min-w-0">
+            <h1 className="font-display truncate text-xl font-semibold leading-none tracking-[-0.03em] md:text-2xl">Prompt Vault</h1>
+            <p className="mt-1 hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-muted sm:block">
+              A library for better thinking
+            </p>
           </div>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-foreground/72 md:text-lg">
-            Keep your best prompts in one elegant place, search them quickly, and reopen full examples whenever you
-            need them.
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
           {isAdmin ? (
             <Link
               href="/admin"
-              className="rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-semibold transition hover:border-accent/60 hover:text-accent"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-foreground px-4 text-sm font-semibold text-background transition hover:-translate-y-0.5 hover:bg-accent hover:text-white"
             >
-              Manage
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Manage prompts
             </Link>
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-panel/80 px-5 py-3 text-sm font-semibold transition hover:border-accent/60 hover:text-accent"
+              className="group inline-flex h-10 items-center gap-2 rounded-xl border border-line/70 bg-background/70 px-4 text-sm font-semibold transition hover:border-foreground/40"
             >
               <LogIn className="h-4 w-4" aria-hidden="true" />
               Sign In
+              <ArrowUpRight className="hidden h-3.5 w-3.5 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 sm:block" />
             </Link>
           )}
           <ThemeToggle />
