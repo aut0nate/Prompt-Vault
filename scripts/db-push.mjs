@@ -1,5 +1,5 @@
 import { dirname, isAbsolute, join, resolve } from "node:path";
-import { mkdirSync } from "node:fs";
+import { closeSync, mkdirSync, openSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 function resolveDatabasePath(databaseUrl) {
@@ -22,6 +22,9 @@ const databasePath = resolveDatabasePath(databaseUrl);
 const absoluteDatabaseUrl = `file:${databasePath}`;
 
 mkdirSync(dirname(databasePath), { recursive: true });
+// Some schema-engine versions require the SQLite file to exist on first use.
+// Append mode preserves every byte when the database already exists.
+closeSync(openSync(databasePath, "a", 0o600));
 
 execFileSync(prismaBinary, ["db", "push", "--skip-generate"], {
   cwd: process.cwd(),
